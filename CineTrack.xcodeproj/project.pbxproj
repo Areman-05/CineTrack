@@ -19,6 +19,7 @@
 		A1000010000000000000001 /* ExplorarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010000000000000001 /* ExplorarView.swift */; };
 		A1000011000000000000001 /* FavoritosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011000000000000001 /* FavoritosView.swift */; };
 		EF8D32512F1E8F6600F09DF1 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D32502F1E8F6600F09DF1 /* File.swift */; };
+		EF8D32542F1E90E800F09DF1 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D32532F1E90E800F09DF1 /* File.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		A2000012000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A3000001000000000000001 /* CineTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF8D32502F1E8F6600F09DF1 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		EF8D32532F1E90E800F09DF1 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = File.swift; path = ../../File.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				A2000003000000000000001 /* Assets.xcassets */,
 				A2000012000000000000001 /* Info.plist */,
 				EF8D32502F1E8F6600F09DF1 /* File.swift */,
+				EF8D32532F1E90E800F09DF1 /* File.swift */,
 			);
 			path = CineTrack;
 			sourceTree = "<group>";
@@ -186,6 +189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000001 /* CineTrackApp.swift in Sources */,
+				EF8D32542F1E90E800F09DF1 /* File.swift in Sources */,
 				A1000002000000000000001 /* ContentView.swift in Sources */,
 				A1000004000000000000001 /* Movie.swift in Sources */,
 				A1000005000000000000001 /* UserPreference.swift in Sources */,
