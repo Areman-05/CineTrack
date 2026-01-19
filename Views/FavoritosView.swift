@@ -157,7 +157,7 @@ struct FavoritosView: View {
     private func favoriteMovieCard(movie: Movie) -> some View {
         HStack(spacing: 16) {
             // Poster
-            AsyncImage(url: movie.posterURL) { image in
+            URLImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)

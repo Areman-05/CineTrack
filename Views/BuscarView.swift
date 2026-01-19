@@ -161,7 +161,7 @@ struct BuscarView: View {
     
     private func gridMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            AsyncImage(url: movie.posterURL) { image in
+            URLImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)

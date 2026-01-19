@@ -41,7 +41,7 @@ struct DetailView: View {
     
     private var headerImage: some View {
         ZStack(alignment: .topLeading) {
-            AsyncImage(url: movie.posterURL) { image in
+            URLImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)

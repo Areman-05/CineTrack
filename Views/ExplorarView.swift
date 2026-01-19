@@ -92,7 +92,7 @@ struct ExplorarView: View {
     
     private func featuredMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            AsyncImage(url: movie.posterURL) { image in
+            URLImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -194,7 +194,7 @@ struct ExplorarView: View {
     
     private func movieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            AsyncImage(url: movie.posterURL) { image in
+            URLImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
