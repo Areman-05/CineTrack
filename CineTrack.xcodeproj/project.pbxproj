@@ -34,6 +34,7 @@
 		A2000010000000000000001 /* ExplorarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExplorarView.swift; path = Views/ExplorarView.swift; sourceTree = "<group>"; };
 		A2000011000000000000001 /* FavoritosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FavoritosView.swift; path = Views/FavoritosView.swift; sourceTree = "<group>"; };
 		A2000012000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A3000001000000000000001 /* CineTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
