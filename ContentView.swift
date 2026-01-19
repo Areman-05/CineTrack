@@ -11,18 +11,21 @@ struct ContentView: View {
                 .tabItem {
                     Label("Inicio", systemImage: "house.fill")
                 }
-            
-            FavoritosView()
-                .tabItem {
-                    Label("Favoritos", systemImage: "heart")
-                }
+                .environmentObject(viewModel)
             
             BuscarView()
                 .tabItem {
-                    Label("Buscar", systemImage: "magnifyingglass")
+                    Label("Explorar", systemImage: "magnifyingglass")
                 }
+                .environmentObject(viewModel)
+            
+            FavoritosView()
+                .tabItem {
+                    Label("Mi Lista", systemImage: "bookmark.fill")
+                }
+                .environmentObject(viewModel)
         }
-        .environmentObject(viewModel)
+        .accentColor(.yellow)
     }
 }
 
