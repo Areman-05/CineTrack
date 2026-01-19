@@ -157,7 +157,7 @@ struct FavoritosView: View {
     private func favoriteMovieCard(movie: Movie) -> some View {
         HStack(spacing: 16) {
             // Poster
-            URLImage(url: movie.posterURL) { image in
+            AsyncImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -237,11 +237,7 @@ struct FavoritosView: View {
     }
 }
 
-}
-
-struct FavoritosView_Previews: PreviewProvider {
-    static var previews: some View {
-        FavoritosView()
-            .environmentObject(MovieViewModel())
-    }
+#Preview {
+    FavoritosView()
+        .environmentObject(MovieViewModel())
 }

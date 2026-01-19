@@ -92,7 +92,7 @@ struct ExplorarView: View {
     
     private func featuredMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            URLImage(url: movie.posterURL) { image in
+            AsyncImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -194,7 +194,7 @@ struct ExplorarView: View {
     
     private func movieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            URLImage(url: movie.posterURL) { image in
+            AsyncImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -239,11 +239,7 @@ struct ExplorarView: View {
     }
 }
 
-}
-
-struct ExplorarView_Previews: PreviewProvider {
-    static var previews: some View {
-        ExplorarView()
-            .environmentObject(MovieViewModel())
-    }
+#Preview {
+    ExplorarView()
+        .environmentObject(MovieViewModel())
 }

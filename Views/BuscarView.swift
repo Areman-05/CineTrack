@@ -161,7 +161,7 @@ struct BuscarView: View {
     
     private func gridMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            URLImage(url: movie.posterURL) { image in
+            AsyncImage(url: movie.posterURL) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -349,11 +349,7 @@ struct RoundedCorner: Shape {
     }
 }
 
-}
-
-struct BuscarView_Previews: PreviewProvider {
-    static var previews: some View {
-        BuscarView()
-            .environmentObject(MovieViewModel())
-    }
+#Preview {
+    BuscarView()
+        .environmentObject(MovieViewModel())
 }
