@@ -32,3 +32,7 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
+Showing Recent Messages
+Build input files cannot be found: '/Users/alumne/Documents/CineTrack6/CineTrack/CineTrackApp.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Models/Models/Movie.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Services/Services/TMDBService.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/ContentView.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Models/Models/UserPreference.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Views/Views/BuscarView.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Views/Views/DetailView.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/ViewModels/ViewModels/MovieViewModel.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Views/Views/FavoritosView.swift', '/Users/alumne/Documents/CineTrack6/CineTrack/Views/Views/ExplorarView.swift'
+
