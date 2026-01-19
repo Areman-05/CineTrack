@@ -2,22 +2,32 @@
 //  ContentView.swift
 //  CineTrack
 //
-//  Created on iOS 15
+//  Vista principal con navegación por tabs
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = MovieViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "film.fill")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Bienvenido a CineTrack")
-                .font(.title)
-                .padding()
+        TabView {
+            ExplorarView()
+                .tabItem {
+                    Label("Inicio", systemImage: "house.fill")
+                }
+            
+            FavoritosView()
+                .tabItem {
+                    Label("Favoritos", systemImage: "heart")
+                }
+            
+            BuscarView()
+                .tabItem {
+                    Label("Buscar", systemImage: "magnifyingglass")
+                }
         }
-        .padding()
+        .environmentObject(viewModel)
     }
 }
 
