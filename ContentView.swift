@@ -1,6 +1,7 @@
 import SwiftUI
 
-// Content View
+/// Vista principal que contiene la navegación por tabs
+/// Implementa el patrón MVVM con @StateObject y @EnvironmentObject
 struct ContentView: View {
     @StateObject private var viewModel = MovieViewModel()
     

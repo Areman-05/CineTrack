@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-// Movie ViewModel
-@MainActor
+/// ViewModel que gestiona el estado y lógica de las películas
+/// Implementa el patrón MVVM siguiendo las directrices de teoría
 class MovieViewModel: ObservableObject {
     @Published private(set) var movies: [Movie] = []
     @Published private(set) var isLoading = false
@@ -11,12 +11,13 @@ class MovieViewModel: ObservableObject {
     
     private let tmdbService = TMDBService.shared
     
+    /// Carga las películas populares desde TMDB
     func loadPopularMovies() {
         isLoading = true
         errorMessage = nil
         
         tmdbService.fetchPopularMovies { [weak self] result in
-            Task { @MainActor in
+            DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
                 case .success(let movies):
@@ -28,6 +29,8 @@ class MovieViewModel: ObservableObject {
         }
     }
     
+    /// Busca películas por título
+    /// - Parameter query: Texto de búsqueda
     func searchMovies(query: String) {
         guard !query.isEmpty else {
             loadPopularMovies()
@@ -38,7 +41,7 @@ class MovieViewModel: ObservableObject {
         errorMessage = nil
         
         tmdbService.searchMovies(query: query) { [weak self] result in
-            Task { @MainActor in
+            DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
                 case .success(let movies):
@@ -50,6 +53,8 @@ class MovieViewModel: ObservableObject {
         }
     }
     
+    /// Marca o desmarca una película como favorita
+    /// - Parameter movieId: ID de la película
     func toggleFavorite(movieId: Int) {
         if userPreferences[movieId] == nil {
             userPreferences[movieId] = UserPreference(isFavorite: true)
@@ -58,10 +63,14 @@ class MovieViewModel: ObservableObject {
         }
     }
     
+    /// Verifica si una película está marcada como favorita
+    /// - Parameter movieId: ID de la película
+    /// - Returns: true si es favorita, false en caso contrario
     func isFavorite(movieId: Int) -> Bool {
         return userPreferences[movieId]?.isFavorite ?? false
     }
     
+    /// Propiedad computada que retorna solo las películas favoritas
     var favoriteMovies: [Movie] {
         movies.filter { isFavorite(movieId: $0.id) }
     }

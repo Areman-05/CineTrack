@@ -1,6 +1,6 @@
 import Foundation
 
-// User Preference Model
+/// Modelo que representa las preferencias del usuario para una película
 struct UserPreference: Codable {
     var isFavorite: Bool
     var personalNote: String
