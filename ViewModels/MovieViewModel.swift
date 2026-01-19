@@ -4,9 +4,9 @@ import SwiftUI
 /// ViewModel que gestiona el estado y lógica de las películas
 /// Implementa el patrón MVVM siguiendo las directrices de teoría
 class MovieViewModel: ObservableObject {
-    @Published private(set) var movies: [Movie] = []
-    @Published private(set) var isLoading = false
-    @Published private(set) var errorMessage: String?
+    @Published var movies: [Movie] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
     
     private let tmdbService = TMDBService.shared
