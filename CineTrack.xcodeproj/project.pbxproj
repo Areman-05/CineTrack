@@ -20,6 +20,7 @@
 		A1000011000000000000001 /* FavoritosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011000000000000001 /* FavoritosView.swift */; };
 		EF8D32512F1E8F6600F09DF1 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D32502F1E8F6600F09DF1 /* File.swift */; };
 		EF8D32542F1E90E800F09DF1 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D32532F1E90E800F09DF1 /* File.swift */; };
+		EF8D32572F1E917A00F09DF1 /* 22222.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D32562F1E917A00F09DF1 /* 22222.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		A3000001000000000000001 /* CineTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF8D32502F1E8F6600F09DF1 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		EF8D32532F1E90E800F09DF1 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = File.swift; path = ../../File.swift; sourceTree = "<group>"; };
+		EF8D32562F1E917A00F09DF1 /* 22222.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = 22222.swift; path = ../../22222.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				A2000012000000000000001 /* Info.plist */,
 				EF8D32502F1E8F6600F09DF1 /* File.swift */,
 				EF8D32532F1E90E800F09DF1 /* File.swift */,
+				EF8D32562F1E917A00F09DF1 /* 22222.swift */,
 			);
 			path = CineTrack;
 			sourceTree = "<group>";
@@ -188,6 +191,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF8D32572F1E917A00F09DF1 /* 22222.swift in Sources */,
 				A1000001000000000000001 /* CineTrackApp.swift in Sources */,
 				EF8D32542F1E90E800F09DF1 /* File.swift in Sources */,
 				A1000002000000000000001 /* ContentView.swift in Sources */,
