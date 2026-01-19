@@ -331,14 +331,18 @@ struct DetailView: View {
     }
 }
 
-#Preview {
-    DetailView(movie: Movie(
-        id: 1,
-        title: "Neon Echoes: The Final Synthesis",
-        overview: "In a world where consciousness can be digitized...",
-        posterPath: nil,
-        voteAverage: 8.5,
-        releaseDate: "2023-01-01"
-    ))
-    .environmentObject(MovieViewModel())
+}
+
+struct DetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        DetailView(movie: Movie(
+            id: 1,
+            title: "Neon Echoes: The Final Synthesis",
+            overview: "In a world where consciousness can be digitized...",
+            posterPath: nil,
+            voteAverage: 8.5,
+            releaseDate: "2023-01-01"
+        ))
+        .environmentObject(MovieViewModel())
+    }
 }

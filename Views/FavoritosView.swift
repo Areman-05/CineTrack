@@ -237,7 +237,11 @@ struct FavoritosView: View {
     }
 }
 
-#Preview {
-    FavoritosView()
-        .environmentObject(MovieViewModel())
+}
+
+struct FavoritosView_Previews: PreviewProvider {
+    static var previews: some View {
+        FavoritosView()
+            .environmentObject(MovieViewModel())
+    }
 }

@@ -239,7 +239,11 @@ struct ExplorarView: View {
     }
 }
 
-#Preview {
-    ExplorarView()
-        .environmentObject(MovieViewModel())
+}
+
+struct ExplorarView_Previews: PreviewProvider {
+    static var previews: some View {
+        ExplorarView()
+            .environmentObject(MovieViewModel())
+    }
 }

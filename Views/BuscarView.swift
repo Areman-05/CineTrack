@@ -349,7 +349,11 @@ struct RoundedCorner: Shape {
     }
 }
 
-#Preview {
-    BuscarView()
-        .environmentObject(MovieViewModel())
+}
+
+struct BuscarView_Previews: PreviewProvider {
+    static var previews: some View {
+        BuscarView()
+            .environmentObject(MovieViewModel())
+    }
 }
