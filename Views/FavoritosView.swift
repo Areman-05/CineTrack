@@ -1,12 +1,6 @@
-//
-//  FavoritosView.swift
-//  CineTrack
-//
-//  Vista de películas favoritas
-//
-
 import SwiftUI
 
+// MARK: - Favoritos View
 struct FavoritosView: View {
     @EnvironmentObject var viewModel: MovieViewModel
     
@@ -18,7 +12,6 @@ struct FavoritosView: View {
         NavigationView {
             Group {
                 if favoriteMovies.isEmpty {
-                    // Empty State
                     VStack(spacing: 16) {
                         Image(systemName: "heart")
                             .font(.system(size: 60))

@@ -1,12 +1,6 @@
-//
-//  Movie.swift
-//  CineTrack
-//
-//  Modelo para los datos de la API TMDB
-//
-
 import Foundation
 
+// Movie Model
 struct Movie: Identifiable, Codable {
     let id: Int
     let title: String
@@ -15,7 +9,6 @@ struct Movie: Identifiable, Codable {
     let voteAverage: Double
     let releaseDate: String
     
-    // Propiedades computadas para facilitar el uso
     var posterURL: URL? {
         guard let posterPath = posterPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
@@ -26,7 +19,6 @@ struct Movie: Identifiable, Codable {
         return components.first ?? releaseDate
     }
     
-    // Mapeo personalizado para la API
     enum CodingKeys: String, CodingKey {
         case id
         case title
@@ -37,12 +29,12 @@ struct Movie: Identifiable, Codable {
     }
 }
 
-// Respuesta de la API para listado de películas
+// API Response
 struct MovieResponse: Codable {
     let results: [Movie]
 }
 
-// Detalles adicionales que se pueden obtener en el detalle
+// Movie Detail
 struct MovieDetail: Codable {
     let id: Int
     let title: String

@@ -1,12 +1,6 @@
-//
-//  DetailView.swift
-//  CineTrack
-//
-//  Vista de detalle de película
-//
-
 import SwiftUI
 
+// MARK: - Detail View
 struct DetailView: View {
     let movie: Movie
     @ObservedObject var viewModel: MovieViewModel
@@ -21,7 +15,6 @@ struct DetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                // Imagen de cabecera
                 ZStack(alignment: .topLeading) {
                     AsyncImage(url: movie.posterURL) { phase in
                         switch phase {
@@ -50,7 +43,6 @@ struct DetailView: View {
                         }
                     }
                     
-                    // Botón de retroceso
                     Button(action: { dismiss() }) {
                         Image(systemName: "arrow.left")
                             .foregroundColor(.white)
@@ -62,7 +54,6 @@ struct DetailView: View {
                     .padding()
                 }
                 
-                // Card con información
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
@@ -71,7 +62,6 @@ struct DetailView: View {
                                 .fontWeight(.bold)
                             
                             HStack(spacing: 12) {
-                                // Género
                                 if let genres = movieDetail?.genres, !genres.isEmpty {
                                     Text(genres.first?.name ?? "")
                                         .font(.subheadline)
@@ -93,7 +83,6 @@ struct DetailView: View {
                                     .foregroundColor(.secondary)
                             }
                             
-                            // Rating
                             HStack(spacing: 8) {
                                 StarRatingView(rating: movie.voteAverage / 2.0)
                                 Text("\(String(format: "%.1f", movie.voteAverage)) / 5.0")
@@ -104,7 +93,6 @@ struct DetailView: View {
                         
                         Spacer()
                         
-                        // Botón de favorito
                         Button(action: {
                             viewModel.toggleFavorite(movieId: movie.id)
                         }) {
@@ -116,7 +104,6 @@ struct DetailView: View {
                     
                     Divider()
                     
-                    // Sinopsis
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Sinopsis")
                             .font(.headline)
@@ -152,7 +139,7 @@ struct DetailView: View {
     }
 }
 
-// Extensión para redondear solo algunas esquinas
+// MARK: - View Extensions
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))

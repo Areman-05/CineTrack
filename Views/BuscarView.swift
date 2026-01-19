@@ -1,12 +1,6 @@
-//
-//  BuscarView.swift
-//  CineTrack
-//
-//  Vista de búsqueda de películas
-//
-
 import SwiftUI
 
+// MARK: - Buscar View
 struct BuscarView: View {
     @EnvironmentObject var viewModel: MovieViewModel
     @State private var searchText = ""
@@ -15,7 +9,6 @@ struct BuscarView: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Barra de búsqueda
                 HStack {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -52,13 +45,11 @@ struct BuscarView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
                 
-                // Contenido
                 if viewModel.isLoading {
                     Spacer()
                     ProgressView("Buscando...")
                     Spacer()
                 } else if searchText.isEmpty {
-                    // Estado inicial
                     Spacer()
                     VStack(spacing: 16) {
                         Image(systemName: "magnifyingglass")
@@ -70,7 +61,6 @@ struct BuscarView: View {
                     }
                     Spacer()
                 } else if viewModel.movies.isEmpty {
-                    // Empty State - No resultados
                     Spacer()
                     VStack(spacing: 16) {
                         Image(systemName: "film.badge.plus")
@@ -85,7 +75,6 @@ struct BuscarView: View {
                     }
                     Spacer()
                 } else {
-                    // Lista de resultados
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.movies) { movie in

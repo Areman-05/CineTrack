@@ -1,23 +1,16 @@
-//
-//  MovieViewModel.swift
-//  CineTrack
-//
-//  ViewModel para gestionar el estado de las películas
-//
-
 import Foundation
 import SwiftUI
 
+// Movie ViewModel
 @MainActor
 class MovieViewModel: ObservableObject {
-    @Published var movies: [Movie] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String?
+    @Published private(set) var movies: [Movie] = []
+    @Published private(set) var isLoading = false
+    @Published private(set) var errorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
     
     private let tmdbService = TMDBService.shared
     
-    // Cargar películas populares
     func loadPopularMovies() {
         isLoading = true
         errorMessage = nil
@@ -35,7 +28,6 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    // Buscar películas
     func searchMovies(query: String) {
         guard !query.isEmpty else {
             loadPopularMovies()
@@ -58,7 +50,6 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    // Toggle favorito
     func toggleFavorite(movieId: Int) {
         if userPreferences[movieId] == nil {
             userPreferences[movieId] = UserPreference(isFavorite: true)
@@ -67,12 +58,10 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    // Verificar si es favorito
     func isFavorite(movieId: Int) -> Bool {
         return userPreferences[movieId]?.isFavorite ?? false
     }
     
-    // Obtener películas favoritas
     var favoriteMovies: [Movie] {
         movies.filter { isFavorite(movieId: $0.id) }
     }

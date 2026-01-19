@@ -1,12 +1,6 @@
-//
-//  UserPreference.swift
-//  CineTrack
-//
-//  Modelo para los datos creados por el usuario
-//
-
 import Foundation
 
+// User Preference Model
 struct UserPreference: Codable {
     var isFavorite: Bool
     var personalNote: String

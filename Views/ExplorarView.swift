@@ -1,12 +1,6 @@
-//
-//  ExplorarView.swift
-//  CineTrack
-//
-//  Vista principal de exploración de películas
-//
-
 import SwiftUI
 
+// MARK: - Explorar View
 struct ExplorarView: View {
     @EnvironmentObject var viewModel: MovieViewModel
     @State private var showingAlert = false
@@ -18,7 +12,6 @@ struct ExplorarView: View {
                     ProgressView("Cargando películas...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if viewModel.movies.isEmpty {
-                    // Empty State
                     VStack(spacing: 16) {
                         Image(systemName: "film")
                             .font(.system(size: 60))
@@ -66,23 +59,20 @@ struct ExplorarView: View {
     }
 }
 
-// Componente de tarjeta de película
+// MARK: - Movie Card
 struct MovieCard: View {
     let movie: Movie
     let isFavorite: Bool
     
     var body: some View {
         HStack(spacing: 12) {
-            // Imagen del poster
             AsyncImage(url: movie.posterURL) { phase in
                 switch phase {
                 case .empty:
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: 60, height: 90)
-                        .overlay(
-                            ProgressView()
-                        )
+                        .overlay(ProgressView())
                 case .success(let image):
                     image
                         .resizable()
@@ -103,7 +93,6 @@ struct MovieCard: View {
             .cornerRadius(8)
             .clipped()
             
-            // Información de la película
             VStack(alignment: .leading, spacing: 4) {
                 Text(movie.title)
                     .font(.headline)
@@ -114,13 +103,12 @@ struct MovieCard: View {
                     Text(movie.releaseYear)
                     Text("•")
                         .foregroundColor(.secondary)
-                    Text("Película") // TODO: Obtener género real
+                    Text("Película")
                         .foregroundColor(.secondary)
                 }
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 
-                // Rating con estrellas
                 HStack(spacing: 4) {
                     StarRatingView(rating: movie.voteAverage / 2.0)
                     Text(String(format: "%.1f", movie.voteAverage))
@@ -131,7 +119,6 @@ struct MovieCard: View {
             
             Spacer()
             
-            // Indicador de favorito
             if isFavorite {
                 Image(systemName: "heart.fill")
                     .foregroundColor(.red)
@@ -145,7 +132,7 @@ struct MovieCard: View {
     }
 }
 
-// Vista de rating con estrellas
+// MARK: - Star Rating View
 struct StarRatingView: View {
     let rating: Double
     let maxRating: Int = 5

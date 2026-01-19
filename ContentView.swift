@@ -1,12 +1,6 @@
-//
-//  ContentView.swift
-//  CineTrack
-//
-//  Vista principal con navegación por tabs
-//
-
 import SwiftUI
 
+// Content View
 struct ContentView: View {
     @StateObject private var viewModel = MovieViewModel()
     

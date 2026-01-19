@@ -1,12 +1,6 @@
-//
-//  CineTrackApp.swift
-//  CineTrack
-//
-//  Created on iOS 15
-//
-
 import SwiftUI
 
+//App Entry Point
 @main
 struct CineTrackApp: App {
     var body: some Scene {
