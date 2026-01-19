@@ -21,7 +21,7 @@ enum TMDBError: Error {
     }
 }
 
-// TMDB Service
+// TMDB 
 class TMDBService {
     static let shared = TMDBService()
     
@@ -75,5 +75,4 @@ class TMDBService {
             }
         }.resume()
     }
-    
-    
+}
