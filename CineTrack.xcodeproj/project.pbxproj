@@ -25,14 +25,14 @@
 		A2000001000000000000001 /* CineTrackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CineTrackApp.swift; sourceTree = "<group>"; };
 		A2000002000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A2000003000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A2000004000000000000001 /* Movie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
-		A2000005000000000000001 /* UserPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreference.swift; sourceTree = "<group>"; };
-		A2000006000000000000001 /* TMDBService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBService.swift; sourceTree = "<group>"; };
-		A2000007000000000000001 /* MovieViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewModel.swift; sourceTree = "<group>"; };
-		A2000008000000000000001 /* BuscarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuscarView.swift; sourceTree = "<group>"; };
-		A2000009000000000000001 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
-		A2000010000000000000001 /* ExplorarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorarView.swift; sourceTree = "<group>"; };
-		A2000011000000000000001 /* FavoritosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosView.swift; sourceTree = "<group>"; };
+		A2000004000000000000001 /* Movie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Movie.swift; path = Models/Movie.swift; sourceTree = "<group>"; };
+		A2000005000000000000001 /* UserPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserPreference.swift; path = Models/UserPreference.swift; sourceTree = "<group>"; };
+		A2000006000000000000001 /* TMDBService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TMDBService.swift; path = Services/TMDBService.swift; sourceTree = "<group>"; };
+		A2000007000000000000001 /* MovieViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MovieViewModel.swift; path = ViewModels/MovieViewModel.swift; sourceTree = "<group>"; };
+		A2000008000000000000001 /* BuscarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuscarView.swift; path = Views/BuscarView.swift; sourceTree = "<group>"; };
+		A2000009000000000000001 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DetailView.swift; path = Views/DetailView.swift; sourceTree = "<group>"; };
+		A2000010000000000000001 /* ExplorarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExplorarView.swift; path = Views/ExplorarView.swift; sourceTree = "<group>"; };
+		A2000011000000000000001 /* FavoritosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FavoritosView.swift; path = Views/FavoritosView.swift; sourceTree = "<group>"; };
 		A2000012000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
