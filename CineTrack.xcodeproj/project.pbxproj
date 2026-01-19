@@ -18,7 +18,6 @@
 		A1000009000000000000001 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009000000000000001 /* DetailView.swift */; };
 		A1000010000000000000001 /* ExplorarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010000000000000001 /* ExplorarView.swift */; };
 		A1000011000000000000001 /* FavoritosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011000000000000001 /* FavoritosView.swift */; };
-		EF8D324C2F1E8E7600F09DF1 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D324B2F1E8E7600F09DF1 /* File.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +34,6 @@
 		A2000011000000000000001 /* FavoritosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosView.swift; sourceTree = "<group>"; };
 		A2000012000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A3000001000000000000001 /* CineTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		EF8D324B2F1E8E7600F09DF1 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,15 +50,14 @@
 		A5000001000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				EF8D324B2F1E8E7600F09DF1 /* File.swift */,
 				A5000002000000000000001 /* CineTrack */,
+				A5000003000000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
 		A5000002000000000000001 /* CineTrack */ = {
 			isa = PBXGroup;
 			children = (
-				A5000003000000000000001 /* Products */,
 				A2000001000000000000001 /* CineTrackApp.swift */,
 				A2000002000000000000001 /* ContentView.swift */,
 				A5000004000000000000001 /* Models */,
@@ -79,7 +76,6 @@
 				A3000001000000000000001 /* CineTrack.app */,
 			);
 			name = Products;
-			path = ..;
 			sourceTree = "<group>";
 		};
 		A5000004000000000000001 /* Models */ = {
@@ -195,7 +191,6 @@
 				A1000008000000000000001 /* BuscarView.swift in Sources */,
 				A1000009000000000000001 /* DetailView.swift in Sources */,
 				A1000010000000000000001 /* ExplorarView.swift in Sources */,
-				EF8D324C2F1E8E7600F09DF1 /* File.swift in Sources */,
 				A1000011000000000000001 /* FavoritosView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
