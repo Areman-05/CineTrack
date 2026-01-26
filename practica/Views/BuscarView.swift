@@ -68,8 +68,8 @@ struct BuscarView: View {
             
             TextField("Buscar...", text: $searchText)
                 .foregroundColor(.white)
-                .onChange(of: searchText) { value in
-                    viewModel.searchMovies(query: value)
+                .onChange(of: searchText) { newValue in
+                    viewModel.searchMovies(query: newValue)
                 }
             
             if !searchText.isEmpty {

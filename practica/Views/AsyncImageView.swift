@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 // ActivityIndicator compatible con iOS 14.4
 struct ActivityIndicator: UIViewRepresentable {
@@ -14,13 +15,46 @@ struct ActivityIndicator: UIViewRepresentable {
     func makeUIView(context: Context) -> UIActivityIndicatorView {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.startAnimating()
-        // Convertir Color a UIColor (disponible desde iOS 14.0)
-        indicator.color = UIColor(color)
+        // Convertir Color a UIColor compatible con iOS 14.4
+        indicator.color = colorToUIColor(color)
         return indicator
     }
     
     func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) {
-        uiView.color = UIColor(color)
+        uiView.color = colorToUIColor(color)
+    }
+    
+    // Helper para convertir Color a UIColor en iOS 14.4
+    private func colorToUIColor(_ color: Color) -> UIColor {
+        // Para iOS 14, usamos una aproximación basada en los colores del sistema
+        switch color {
+        case .primary:
+            return .label
+        case .secondary:
+            return .secondaryLabel
+        case .yellow:
+            return .systemYellow
+        case .red:
+            return .systemRed
+        case .blue:
+            return .systemBlue
+        case .green:
+            return .systemGreen
+        case .gray:
+            return .systemGray
+        case .white:
+            return .white
+        case .black:
+            return .black
+        default:
+            // Para otros colores, intentamos usar el inicializador si está disponible
+            if #available(iOS 15.0, *) {
+                return UIColor(color)
+            } else {
+                // Fallback a un color por defecto
+                return .label
+            }
+        }
     }
 }
 
