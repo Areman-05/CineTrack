@@ -145,7 +145,7 @@ struct FavoritosView: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.favoriteMovies) { movie in
-                    NavigationLink(destination: DetailView(movie: movie)) {
+                    NavigationLink(destination: DetailView(movie: movie).environmentObject(viewModel)) {
                         favoriteMovieCard(movie: movie)
                     }
                 }
@@ -157,16 +157,11 @@ struct FavoritosView: View {
     private func favoriteMovieCard(movie: Movie) -> some View {
         HStack(spacing: 16) {
             // Poster
-            AsyncImage(url: movie.posterURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-            }
-            .frame(width: 100, height: 140)
-            .cornerRadius(8)
+            AsyncImageView(url: movie.posterURL)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 100, height: 140)
+                .cornerRadius(8)
+                .clipped()
             .overlay(
                 VStack {
                     HStack {
@@ -237,7 +232,11 @@ struct FavoritosView: View {
     }
 }
 
-#Preview {
-    FavoritosView()
-        .environmentObject(MovieViewModel())
+#if DEBUG
+struct FavoritosView_Previews: PreviewProvider {
+    static var previews: some View {
+        FavoritosView()
+            .environmentObject(MovieViewModel())
+    }
 }
+#endif

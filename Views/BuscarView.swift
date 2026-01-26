@@ -29,8 +29,7 @@ struct BuscarView: View {
                     // Results
                     if viewModel.isLoading {
                         Spacer()
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                        ActivityIndicator(color: .yellow)
                         Spacer()
                     } else {
                         movieGrid
@@ -69,8 +68,8 @@ struct BuscarView: View {
             
             TextField("Buscar...", text: $searchText)
                 .foregroundColor(.white)
-                .onChange(of: searchText) { newValue in
-                    viewModel.searchMovies(query: newValue)
+                .onChange(of: searchText) { value in
+                    viewModel.searchMovies(query: value)
                 }
             
             if !searchText.isEmpty {
@@ -150,7 +149,7 @@ struct BuscarView: View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                 ForEach(filteredMovies) { movie in
-                    NavigationLink(destination: DetailView(movie: movie)) {
+                    NavigationLink(destination: DetailView(movie: movie).environmentObject(viewModel)) {
                         gridMovieCard(movie: movie)
                     }
                 }
@@ -161,16 +160,11 @@ struct BuscarView: View {
     
     private func gridMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            AsyncImage(url: movie.posterURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-            }
-            .frame(height: 240)
-            .cornerRadius(12)
+            AsyncImageView(url: movie.posterURL)
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 240)
+                .cornerRadius(12)
+                .clipped()
             .overlay(
                 VStack {
                     HStack {
@@ -349,7 +343,11 @@ struct RoundedCorner: Shape {
     }
 }
 
-#Preview {
-    BuscarView()
-        .environmentObject(MovieViewModel())
+#if DEBUG
+struct BuscarView_Previews: PreviewProvider {
+    static var previews: some View {
+        BuscarView()
+            .environmentObject(MovieViewModel())
+    }
 }
+#endif

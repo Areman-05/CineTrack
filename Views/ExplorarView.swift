@@ -92,16 +92,11 @@ struct ExplorarView: View {
     
     private func featuredMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            AsyncImage(url: movie.posterURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-            }
-            .frame(height: 400)
-            .cornerRadius(12)
+            AsyncImageView(url: movie.posterURL)
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 400)
+                .cornerRadius(12)
+                .clipped()
             .overlay(
                 VStack(alignment: .leading) {
                     Spacer()
@@ -182,7 +177,7 @@ struct ExplorarView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(movies) { movie in
-                        NavigationLink(destination: DetailView(movie: movie)) {
+                        NavigationLink(destination: DetailView(movie: movie).environmentObject(viewModel)) {
                             movieCard(movie: movie)
                         }
                     }
@@ -194,16 +189,11 @@ struct ExplorarView: View {
     
     private func movieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            AsyncImage(url: movie.posterURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-            }
-            .frame(width: 140, height: 200)
-            .cornerRadius(8)
+            AsyncImageView(url: movie.posterURL)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 140, height: 200)
+                .cornerRadius(8)
+                .clipped()
             .overlay(
                 VStack {
                     HStack {
@@ -239,7 +229,11 @@ struct ExplorarView: View {
     }
 }
 
-#Preview {
-    ExplorarView()
-        .environmentObject(MovieViewModel())
+#if DEBUG
+struct ExplorarView_Previews: PreviewProvider {
+    static var previews: some View {
+        ExplorarView()
+            .environmentObject(MovieViewModel())
+    }
 }
+#endif
