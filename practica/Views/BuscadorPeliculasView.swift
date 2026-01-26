@@ -8,6 +8,7 @@ struct BuscadorPeliculasView: View {
             Text("Buscador de Películas")
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .padding()
             
             HStack {
                 Image(systemName: "magnifyingglass")
@@ -15,6 +16,7 @@ struct BuscadorPeliculasView: View {
                 
                 TextField("Buscar películas...", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal, 8)
                 
                 if !searchText.isEmpty {
                     Button(action: {
@@ -25,16 +27,16 @@ struct BuscadorPeliculasView: View {
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal)
             
             if searchText.isEmpty {
                 Text("Escribe para buscar películas")
                     .foregroundColor(.gray)
-                    .padding()
+                    .font(.subheadline)
             } else {
                 Text("Buscando: \(searchText)")
                     .foregroundColor(.blue)
-                    .padding()
+                    .font(.headline)
             }
             
             Spacer()
@@ -43,10 +45,8 @@ struct BuscadorPeliculasView: View {
     }
 }
 
-#if DEBUG
 struct BuscadorPeliculasView_Previews: PreviewProvider {
     static var previews: some View {
         BuscadorPeliculasView()
     }
 }
-#endif
