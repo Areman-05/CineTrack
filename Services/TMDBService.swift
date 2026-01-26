@@ -20,9 +20,6 @@ enum TMDBError: Error {
         }
     }
 }
-
-/// Servicio para interactuar con la API de The Movie Database (TMDB)
-/// Implementa el patrón Singleton para garantizar una única instancia
 class TMDBService {
     static let shared = TMDBService()
     
@@ -33,7 +30,6 @@ class TMDBService {
     private init() {}
     
     /// Obtiene las películas populares de TMDB
-    /// - Parameter completion: Closure que se ejecuta con el resultado
     func fetchPopularMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/movie/popular?api_key=\(apiKey)&language=\(language)") else {
             completion(.failure(TMDBError.invalidURL))
@@ -44,9 +40,6 @@ class TMDBService {
     }
     
     /// Busca películas por título
-    /// - Parameters:
-    ///   - query: Texto de búsqueda
-    ///   - completion: Closure que se ejecuta con el resultado
     func searchMovies(query: String, completion: @escaping (Result<[Movie], Error>) -> Void) {
         guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let url = URL(string: "\(baseURL)/search/movie?api_key=\(apiKey)&language=\(language)&query=\(encodedQuery)") else {
@@ -58,9 +51,6 @@ class TMDBService {
     }
     
     /// Obtiene los detalles completos de una película
-    /// - Parameters:
-    ///   - id: ID de la película
-    ///   - completion: Closure que se ejecuta con el resultado
     func fetchMovieDetails(id: Int, completion: @escaping (Result<MovieDetail, Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/movie/\(id)?api_key=\(apiKey)&language=\(language)") else {
             completion(.failure(TMDBError.invalidURL))
@@ -88,9 +78,6 @@ class TMDBService {
     }
     
     /// Método privado para realizar peticiones HTTP genéricas
-    /// - Parameters:
-    ///   - url: URL de la petición
-    ///   - completion: Closure que se ejecuta con el resultado
     private func performRequest(url: URL, completion: @escaping (Result<[Movie], Error>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
