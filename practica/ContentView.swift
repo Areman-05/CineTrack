@@ -15,12 +15,24 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            DetailView()
+            ExplorarView()
                 .tabItem {
-                    Label("Inicio", systemImage: "house.fill")
+                    Label("Explorar", systemImage: "house.fill")
                 }
                 .environmentObject(viewModel)
             
+            BuscarView()
+                .tabItem {
+                    Label("Buscar", systemImage: "magnifyingglass")
+                }
+                .environmentObject(viewModel)
+            
+            FavoritosView()
+                .tabItem {
+                    Label("Favoritos", systemImage: "heart.fill")
+                }
+                .environmentObject(viewModel)
+        }
         .accentColor(.yellow)
     }
 }
