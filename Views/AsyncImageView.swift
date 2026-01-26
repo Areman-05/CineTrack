@@ -1,20 +1,14 @@
-//
-//  AsyncImageView.swift
-//  CineTrack
-//
-//  Componente de imagen asíncrona compatible con iOS 14.4
-//
-
 import SwiftUI
 
-// ActivityIndicator compatible con iOS 14.4
+// Carga imágenes desde URL (compatible iOS 14.4)
+
+// Indicador de carga
 struct ActivityIndicator: UIViewRepresentable {
     var color: Color = .primary
     
     func makeUIView(context: Context) -> UIActivityIndicatorView {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.startAnimating()
-        // Convertir Color a UIColor (disponible desde iOS 14.0)
         indicator.color = UIColor(color)
         return indicator
     }
