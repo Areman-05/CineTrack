@@ -36,7 +36,6 @@ struct ContentView: View {
         .accentColor(.yellow)
     }
 }
-}
 #if DEBUG
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
