@@ -2,7 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        BuscadorPeliculasView()
+        Text("Hola Mundo")
+            .font(.largeTitle)
     }
 }
 

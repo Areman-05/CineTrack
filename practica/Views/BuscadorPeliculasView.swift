@@ -4,44 +4,20 @@ struct BuscadorPeliculasView: View {
     @State private var searchText = ""
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack {
             Text("Buscador de Películas")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+                .font(.title)
                 .padding()
             
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                
-                TextField("Buscar películas...", text: $searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal, 8)
-                
-                if !searchText.isEmpty {
-                    Button(action: {
-                        searchText = ""
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            .padding(.horizontal)
+            TextField("Buscar...", text: $searchText)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
             
-            if searchText.isEmpty {
-                Text("Escribe para buscar películas")
-                    .foregroundColor(.gray)
-                    .font(.subheadline)
-            } else {
-                Text("Buscando: \(searchText)")
-                    .foregroundColor(.blue)
-                    .font(.headline)
-            }
+            Text(searchText.isEmpty ? "Escribe algo" : "Buscando: \(searchText)")
+                .padding()
             
             Spacer()
         }
-        .padding()
     }
 }
 
