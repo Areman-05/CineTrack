@@ -92,11 +92,17 @@ struct ExplorarView: View {
     
     private func featuredMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            AsyncImageView(url: movie.posterURL)
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 400)
-                .cornerRadius(12)
-                .clipped()
+            URLImage(url: movie.posterURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+            }
+            .frame(height: 400)
+            .cornerRadius(12)
+            .clipped()
             .overlay(
                 VStack(alignment: .leading) {
                     Spacer()

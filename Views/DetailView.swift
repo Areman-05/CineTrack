@@ -41,10 +41,16 @@ struct DetailView: View {
     
     private var headerImage: some View {
         ZStack(alignment: .topLeading) {
-            AsyncImageView(url: movie.posterURL)
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 500)
-                .clipped()
+            URLImage(url: movie.posterURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+            }
+            .frame(height: 500)
+            .clipped()
             
             // Gradient Overlay
             LinearGradient(

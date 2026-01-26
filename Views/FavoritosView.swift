@@ -157,11 +157,17 @@ struct FavoritosView: View {
     private func favoriteMovieCard(movie: Movie) -> some View {
         HStack(spacing: 16) {
             // Poster
-            AsyncImageView(url: movie.posterURL)
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 100, height: 140)
-                .cornerRadius(8)
-                .clipped()
+            URLImage(url: movie.posterURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+            }
+            .frame(width: 100, height: 140)
+            .cornerRadius(8)
+            .clipped()
             .overlay(
                 VStack {
                     HStack {

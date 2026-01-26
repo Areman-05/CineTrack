@@ -160,11 +160,17 @@ struct BuscarView: View {
     
     private func gridMovieCard(movie: Movie) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            AsyncImageView(url: movie.posterURL)
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 240)
-                .cornerRadius(12)
-                .clipped()
+            URLImage(url: movie.posterURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+            }
+            .frame(height: 240)
+            .cornerRadius(12)
+            .clipped()
             .overlay(
                 VStack {
                     HStack {
