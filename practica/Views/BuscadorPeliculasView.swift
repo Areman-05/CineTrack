@@ -30,7 +30,7 @@ struct BuscadorPeliculasView: View {
             .padding(.horizontal)
             
             if searchText.isEmpty {
-                Text("Escribe para buscar películas")
+                Text("Escribe para  a buscar películas")
                     .foregroundColor(.gray)
                     .font(.subheadline)
             } else {
