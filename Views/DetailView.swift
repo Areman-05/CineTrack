@@ -41,16 +41,10 @@ struct DetailView: View {
     
     private var headerImage: some View {
         ZStack(alignment: .topLeading) {
-            AsyncImage(url: movie.posterURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-            }
-            .frame(height: 500)
-            .clipped()
+            AsyncImageView(url: movie.posterURL)
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 500)
+                .clipped()
             
             // Gradient Overlay
             LinearGradient(
@@ -331,14 +325,18 @@ struct DetailView: View {
     }
 }
 
-#Preview {
-    DetailView(movie: Movie(
-        id: 1,
-        title: "Neon Echoes: The Final Synthesis",
-        overview: "In a world where consciousness can be digitized...",
-        posterPath: nil,
-        voteAverage: 8.5,
-        releaseDate: "2023-01-01"
-    ))
-    .environmentObject(MovieViewModel())
+#if DEBUG
+struct DetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        DetailView(movie: Movie(
+            id: 1,
+            title: "Neon Echoes: The Final Synthesis",
+            overview: "In a world where consciousness can be digitized...",
+            posterPath: nil,
+            voteAverage: 8.5,
+            releaseDate: "2023-01-01"
+        ))
+        .environmentObject(MovieViewModel())
+    }
 }
+#endif
