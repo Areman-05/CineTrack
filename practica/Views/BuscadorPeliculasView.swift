@@ -3,6 +3,10 @@ import SwiftUI
 struct BuscadorPeliculasView: View {
     @State private var searchText = ""
     
+    init() {
+        print("🔍 BuscadorPeliculasView inicializada")
+    }
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Buscador de Películas")

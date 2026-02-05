@@ -1,8 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    init() {
+        print("📱 ContentView inicializada")
+    }
+    
     var body: some View {
         BuscadorPeliculasView()
+            .onAppear {
+                print("✅ BuscadorPeliculasView apareció")
+            }
     }
 }
 
