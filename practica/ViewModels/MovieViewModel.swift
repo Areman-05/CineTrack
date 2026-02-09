@@ -5,11 +5,26 @@ import SwiftUI
 /// Implementa el patrón MVVM siguiendo las directrices de teoría
 class MovieViewModel: ObservableObject {
     @Published var movies: [Movie] = []
+    @Published var genres: [Genre] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
     
     private let tmdbService = TMDBService.shared
+    
+    /// Carga la lista de géneros (para filtros de búsqueda)
+    func loadGenres() {
+        tmdbService.fetchMovieGenres { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let list):
+                    self?.genres = list
+                case .failure:
+                    self?.genres = []
+                }
+            }
+        }
+    }
     
     /// Carga las películas populares desde TMDB
     func loadPopularMovies() {
@@ -29,25 +44,42 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    /// Busca películas por título
-    /// - Parameter query: Texto de búsqueda
+    /// Busca películas por título (sin filtros adicionales)
     func searchMovies(query: String) {
-        guard !query.isEmpty else {
-            loadPopularMovies()
-            return
-        }
-        
+        searchWithFilters(query: query, minRating: nil, genreIds: nil)
+    }
+    
+    /// Búsqueda con criterios: título, puntuación mínima y/o género(s).
+    /// Si no hay texto, usa discover con filtros. Si hay texto, busca por título y filtra por puntuación.
+    func searchWithFilters(query: String, minRating: Double?, genreIds: [Int]?) {
         isLoading = true
         errorMessage = nil
         
-        tmdbService.searchMovies(query: query) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                switch result {
-                case .success(let movies):
-                    self?.movies = movies
-                case .failure(let error):
-                    self?.errorMessage = "Error en la búsqueda: \(error.localizedDescription)"
+        if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tmdbService.discoverMovies(minRating: minRating, genreIds: genreIds) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    switch result {
+                    case .success(let movies):
+                        self?.movies = movies
+                    case .failure(let error):
+                        self?.errorMessage = "Error al cargar: \(error.localizedDescription)"
+                    }
+                }
+            }
+        } else {
+            tmdbService.searchMovies(query: query) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    switch result {
+                    case .success(var movies):
+                        if let min = minRating, min > 0 {
+                            movies = movies.filter { $0.voteAverage >= min }
+                        }
+                        self?.movies = movies
+                    case .failure(let error):
+                        self?.errorMessage = "Error en la búsqueda: \(error.localizedDescription)"
+                    }
                 }
             }
         }

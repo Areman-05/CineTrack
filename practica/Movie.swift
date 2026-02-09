@@ -71,6 +71,11 @@ struct Genre: Codable, Identifiable {
     let name: String
 }
 
+/// Respuesta de la API de géneros de películas.
+struct GenreListResponse: Codable {
+    let genres: [Genre]
+}
+
 /// Modelo detallado de una película/serie con géneros.
 struct MovieDetail: Codable {
     let id: Int

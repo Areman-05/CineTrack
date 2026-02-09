@@ -39,6 +39,51 @@ class TMDBService {
         performRequest(url: url, completion: completion)
     }
     
+    /// Lista de géneros de películas (para filtros)
+    func fetchMovieGenres(completion: @escaping (Result<[Genre], Error>) -> Void) {
+        guard let url = URL(string: "\(baseURL)/genre/movie/list?api_key=\(apiKey)&language=\(language)") else {
+            completion(.failure(TMDBError.invalidURL))
+            return
+        }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(TMDBError.networkError(error)))
+                return
+            }
+            guard let data = data else {
+                completion(.failure(TMDBError.noData))
+                return
+            }
+            do {
+                let decoded = try JSONDecoder().decode(GenreListResponse.self, from: data)
+                completion(.success(decoded.genres))
+            } catch {
+                completion(.failure(TMDBError.decodingError))
+            }
+        }.resume()
+    }
+    
+    /// Descubre películas por puntuación mínima y/o género(s)
+    func discoverMovies(minRating: Double?, genreIds: [Int]?, completion: @escaping (Result<[Movie], Error>) -> Void) {
+        var components = URLComponents(string: "\(baseURL)/discover/movie")
+        var queryItems = [
+            URLQueryItem(name: "api_key", value: apiKey),
+            URLQueryItem(name: "language", value: language)
+        ]
+        if let min = minRating, min > 0 {
+            queryItems.append(URLQueryItem(name: "vote_average.gte", value: String(min)))
+        }
+        if let ids = genreIds, !ids.isEmpty {
+            queryItems.append(URLQueryItem(name: "with_genres", value: ids.map { String($0) }.joined(separator: ",")))
+        }
+        components.queryItems = queryItems
+        guard let url = components.url else {
+            completion(.failure(TMDBError.invalidURL))
+            return
+        }
+        performRequest(url: url, completion: completion)
+    }
+    
     /// Busca películas por título
     func searchMovies(query: String, completion: @escaping (Result<[Movie], Error>) -> Void) {
         guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -46,7 +91,6 @@ class TMDBService {
             completion(.failure(TMDBError.invalidURL))
             return
         }
-        
         performRequest(url: url, completion: completion)
     }
     
