@@ -54,7 +54,6 @@ class MovieViewModel: ObservableObject {
     }
     
     /// Marca o desmarca una película como favorita
-    /// - Parameter movieId: ID de la película
     func toggleFavorite(movieId: Int) {
         if userPreferences[movieId] == nil {
             userPreferences[movieId] = UserPreference(isFavorite: true)
@@ -63,14 +62,42 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    /// Verifica si una película está marcada como favorita
-    /// - Parameter movieId: ID de la película
-    /// - Returns: true si es favorita, false en caso contrario
+    /// Actualiza el estado de visualización (previsto ver, viendo, visto)
+    func setWatchStatus(movieId: Int, status: WatchStatus) {
+        if userPreferences[movieId] == nil {
+            userPreferences[movieId] = UserPreference(watchStatus: status)
+        } else {
+            userPreferences[movieId]?.watchStatus = status
+        }
+    }
+    
+    /// Actualiza la nota personal de una película/serie
+    func updatePersonalNote(movieId: Int, note: String) {
+        if userPreferences[movieId] == nil {
+            userPreferences[movieId] = UserPreference(personalNote: note)
+        } else {
+            userPreferences[movieId]?.personalNote = note
+        }
+    }
+    
+    /// Elimina una película/serie de la lista del usuario (quitar de favoritos y preferencias)
+    func removeFromList(movieId: Int) {
+        userPreferences.removeValue(forKey: movieId)
+    }
+    
     func isFavorite(movieId: Int) -> Bool {
         return userPreferences[movieId]?.isFavorite ?? false
     }
     
-    /// Propiedad computada que retorna solo las películas favoritas
+    func watchStatus(for movieId: Int) -> WatchStatus {
+        return userPreferences[movieId]?.watchStatus ?? .toWatch
+    }
+    
+    func personalNote(for movieId: Int) -> String {
+        return userPreferences[movieId]?.personalNote ?? ""
+    }
+    
+    /// Lista de favoritos del usuario
     var favoriteMovies: [Movie] {
         movies.filter { isFavorite(movieId: $0.id) }
     }
