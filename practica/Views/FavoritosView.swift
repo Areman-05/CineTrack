@@ -8,19 +8,23 @@ struct FavoritosView: View {
 
     var body: some View {
         NavigationView {
-            Group {
+            ZStack {
+                AppTheme.background.ignoresSafeArea()
+
                 if viewModel.favoriteMovies.isEmpty {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 20) {
                         Image(systemName: "heart.slash")
-                            .font(.largeTitle)
-                            .foregroundColor(.gray)
+                            .font(.system(size: 56))
+                            .foregroundColor(AppTheme.textTertiary)
                         Text("No tienes favoritos")
-                            .foregroundColor(.gray)
-                        Text("Marca como favorito en Buscador para verlos aquí.")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(AppTheme.textPrimary)
+                        Text("Marca como favorito en Inicio para verlos aquí.")
+                            .font(.subheadline)
+                            .foregroundColor(AppTheme.textSecondary)
                             .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 40)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -29,13 +33,18 @@ struct FavoritosView: View {
                             NavigationLink(destination: DetailView(movie: movie)) {
                                 FavoritoRowView(movie: movie, viewModel: viewModel)
                             }
+                            .listRowBackground(AppTheme.surface)
+                            .foregroundColor(AppTheme.textPrimary)
                         }
                         .onDelete(perform: eliminarFavorito)
                     }
+                    .listStyle(PlainListStyle())
                 }
             }
             .navigationTitle("Favoritos")
+            .navigationBarTitleDisplayMode(.large)
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 
     private func eliminarFavorito(at offsets: IndexSet) {
@@ -52,26 +61,36 @@ struct FavoritoRowView: View {
     @ObservedObject var viewModel: MovieViewModel
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(movie.title)
-                    .font(.headline)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundColor(AppTheme.textPrimary)
+                    .lineLimit(2)
                 HStack(spacing: 8) {
                     Text(movie.mediaType?.displayName ?? "Película")
                         .font(.caption)
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppTheme.accent)
                     Text("·")
+                        .foregroundColor(AppTheme.textTertiary)
                     Text(viewModel.watchStatus(for: movie.id).displayName)
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppTheme.textSecondary)
                 }
             }
             Spacer()
-            Text(String(format: "%.1f", movie.voteAverage))
-                .font(.subheadline)
-                .foregroundColor(.gray)
+            HStack(spacing: 4) {
+                Image(systemName: "star.fill")
+                    .font(.caption2)
+                    .foregroundColor(AppTheme.accent)
+                Text(String(format: "%.1f", movie.voteAverage))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(AppTheme.textSecondary)
+            }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
     }
 }
 

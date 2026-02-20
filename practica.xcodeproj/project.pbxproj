@@ -19,6 +19,7 @@
 		EF84562B2F27BDA200D3FE74 /* BuscadorPeliculasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF84562C2F27BDA200D3FE74 /* BuscadorPeliculasView.swift */; };
 		EF84562D2F27BDA200D3FE74 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF84562E2F27BDA200D3FE74 /* DetailView.swift */; };
 		EF84562F2F27BDA200D3FE74 /* FavoritosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456302F27BDA200D3FE74 /* FavoritosView.swift */; };
+		EF8456312F27BDA200D3FE74 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456322F27BDA200D3FE74 /* AppTheme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		EF84562C2F27BDA200D3FE74 /* BuscadorPeliculasView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BuscadorPeliculasView.swift; sourceTree = "<group>"; };
 		EF84562E2F27BDA200D3FE74 /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		EF8456302F27BDA200D3FE74 /* FavoritosView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritosView.swift; sourceTree = "<group>"; };
+		EF8456322F27BDA200D3FE74 /* AppTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +119,7 @@
 		EF84561E2F27BDA200D3FE74 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				EF8456322F27BDA200D3FE74 /* AppTheme.swift */,
 				EF8456242F27BDA200D3FE74 /* AsyncImageView.swift */,
 				EF84562C2F27BDA200D3FE74 /* BuscadorPeliculasView.swift */,
 				EF84562E2F27BDA200D3FE74 /* DetailView.swift */,
@@ -205,6 +208,7 @@
 				EF84562B2F27BDA200D3FE74 /* BuscadorPeliculasView.swift in Sources */,
 				EF84562D2F27BDA200D3FE74 /* DetailView.swift in Sources */,
 				EF84562F2F27BDA200D3FE74 /* FavoritosView.swift in Sources */,
+				EF8456312F27BDA200D3FE74 /* AppTheme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,93 +12,112 @@ struct DetailView: View {
     @State private var estadoVer: WatchStatus = .toWatch
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Tipo: Película o Serie (requisito distinguir movie/serie)
-                Text(movie.mediaType?.displayName ?? "Película")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.blue)
-                    .cornerRadius(4)
+        ZStack {
+            AppTheme.background.ignoresSafeArea()
 
-                Text(movie.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                HStack {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                    Text(String(format: "%.1f", movie.voteAverage))
-                    Text("·")
-                    Text(movie.releaseYear)
-                    Spacer()
-                }
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-
-                if !movie.overview.isEmpty {
-                    Text(movie.overview)
-                        .font(.body)
-                        .foregroundColor(.primary)
-                }
-
-                // Botón favorito (requisito: marcar como favorito)
-                Button(action: {
-                    viewModel.toggleFavorite(movieId: movie.id)
-                }) {
-                    HStack {
-                        Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
-                        Text(viewModel.isFavorite(movieId: movie.id) ? "Quitar de Favoritos" : "Añadir a Favoritos")
-                    }
-                    .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? .red : .blue)
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                // Estado: previsto ver / viendo / visto (requisito profesora)
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Estado")
-                        .font(.subheadline)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Tipo: Película o Serie
+                    Text(movie.mediaType?.displayName ?? "Película")
+                        .font(.caption)
                         .fontWeight(.semibold)
-                    Picker("Estado", selection: $estadoVer) {
-                        ForEach(WatchStatus.allCases, id: \.self) { s in
-                            Text(s.displayName).tag(s)
+                        .foregroundColor(Color.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AppTheme.accent)
+                        .cornerRadius(6)
+
+                    Text(movie.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(AppTheme.textPrimary)
+
+                    HStack(spacing: 8) {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(AppTheme.accent)
+                            .font(.subheadline)
+                        Text(String(format: "%.1f", movie.voteAverage))
+                            .foregroundColor(AppTheme.textSecondary)
+                        Text("·")
+                            .foregroundColor(AppTheme.textTertiary)
+                        Text(movie.releaseYear)
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                    .font(.subheadline)
+
+                    if !movie.overview.isEmpty {
+                        Text(movie.overview)
+                            .font(.body)
+                            .foregroundColor(AppTheme.textSecondary)
+                            .lineSpacing(4)
+                    }
+
+                    // Sección: Favorito y estado
+                    VStack(alignment: .leading, spacing: 14) {
+                        Button(action: {
+                            viewModel.toggleFavorite(movieId: movie.id)
+                        }) {
+                            HStack(spacing: 10) {
+                                Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
+                                    .font(.body)
+                                Text(viewModel.isFavorite(movieId: movie.id) ? "Quitar de Favoritos" : "Añadir a Favoritos")
+                                    .fontWeight(.medium)
+                            }
+                            .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.accent)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(AppTheme.surface)
+                            .cornerRadius(10)
                         }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .onChange(of: estadoVer, perform: { newValue in
-                        viewModel.setWatchStatus(movieId: movie.id, status: newValue)
-                    })
-                }
+                        .buttonStyle(PlainButtonStyle())
 
-                // Nota personal (requisito: personalNote)
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Nota personal")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    TextField("Escribe una nota...", text: $notaPersonal)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .onChange(of: notaPersonal, perform: { newValue in
-                            viewModel.updatePersonalNote(movieId: movie.id, note: newValue)
-                        })
-                }
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Estado")
+                                .font(.caption)
+                                .foregroundColor(AppTheme.textSecondary)
+                            Picker("Estado", selection: $estadoVer) {
+                                ForEach(WatchStatus.allCases, id: \.self) { s in
+                                    Text(s.displayName).tag(s)
+                                }
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                            .onChange(of: estadoVer, perform: { newValue in
+                                viewModel.setWatchStatus(movieId: movie.id, status: newValue)
+                            })
+                        }
 
-                // Eliminar de mi lista (CRUD: eliminar)
-                Button(action: {
-                    viewModel.removeFromList(movieId: movie.id)
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "trash")
-                        Text("Quitar de mi lista")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Nota personal")
+                                .font(.caption)
+                                .foregroundColor(AppTheme.textSecondary)
+                            TextField("Escribe una nota...", text: $notaPersonal)
+                                .foregroundColor(AppTheme.textPrimary)
+                                .padding(12)
+                                .background(AppTheme.surface)
+                                .cornerRadius(10)
+                                .onChange(of: notaPersonal, perform: { newValue in
+                                    viewModel.updatePersonalNote(movieId: movie.id, note: newValue)
+                                })
+                        }
+
+                        Button(action: {
+                            viewModel.removeFromList(movieId: movie.id)
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "trash")
+                                Text("Quitar de mi lista")
+                                    .fontWeight(.medium)
+                            }
+                            .foregroundColor(AppTheme.error)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .foregroundColor(.red)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .padding(20)
             }
-            .padding()
         }
         .navigationTitle(movie.title)
         .navigationBarTitleDisplayMode(.inline)

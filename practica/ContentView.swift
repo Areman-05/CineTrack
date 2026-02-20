@@ -16,7 +16,8 @@ struct ContentView: View {
                     Text("Favoritos")
                 }
         }
-        .accentColor(.blue)
+        .accentColor(AppTheme.accent)
+        .preferredColorScheme(.dark)
     }
 }
 
