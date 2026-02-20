@@ -42,7 +42,11 @@ class MovieViewModel: ObservableObject {
             userPreferences = [:]
             return
         }
-        userPreferences = Dictionary(uniqueKeysWithValues: decoded.map { ($0.movieId, $0.preference) })
+        var prefs: [Int: UserPreference] = [:]
+        for item in decoded {
+            prefs[item.movieId] = item.preference
+        }
+        userPreferences = prefs
     }
 
     private func saveUserPreferences() {
@@ -66,12 +70,15 @@ class MovieViewModel: ObservableObject {
     }
 
     private func loadMovieCache() {
-        guard let data = UserDefaults.standard.data(forKey: movieCacheKey),
-              let decoded = try? JSONDecoder().decode([Movie].self, from: data) else {
+        guard let data = UserDefaults.standard.data(forKey: movieCacheKey) else {
             movieCache = []
             return
         }
-        movieCache = decoded
+        do {
+            movieCache = try JSONDecoder().decode([Movie].self, from: data)
+        } catch {
+            movieCache = []
+        }
     }
 
     private func saveMovieCache() {
@@ -105,8 +112,10 @@ class MovieViewModel: ObservableObject {
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
         guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-        if !favoriteLists[i].movieIds.contains(movieId) {
-            favoriteLists[i].movieIds.append(movieId)
+        var list = favoriteLists[i]
+        if !list.movieIds.contains(movieId) {
+            list.movieIds.append(movieId)
+            favoriteLists[i] = list
             saveFavoriteLists()
             if let m = movie { addToCacheIfNeeded(m) }
         }
@@ -114,7 +123,9 @@ class MovieViewModel: ObservableObject {
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
         guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-        favoriteLists[i].movieIds.removeAll { $0 == movieId }
+        var list = favoriteLists[i]
+        list.movieIds.removeAll { $0 == movieId }
+        favoriteLists[i] = list
         saveFavoriteLists()
     }
 
@@ -160,7 +171,7 @@ class MovieViewModel: ObservableObject {
     func loadExploreMovies() {
         isLoadingExplore = true
         exploreErrorMessage = nil
-        tmdbService.fetchTopRatedMovies { [weak self] result in
+        tmdbService.fetchTopRatedMovies { [weak self] (result: Result<[Movie], Error>) in
             DispatchQueue.main.async {
                 self?.isLoadingExplore = false
                 switch result {
