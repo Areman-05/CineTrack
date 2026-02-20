@@ -188,6 +188,18 @@ struct BuscadorPeliculasView: View {
                         MovieCardView(movie: movie, viewModel: viewModel, showFavorite: true, showWatchStatus: false, large: true)
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .contextMenu {
+                        Button(action: { viewModel.toggleFavorite(movieId: movie.id, movie: movie) }) {
+                            Label(viewModel.isFavorite(movieId: movie.id) ? "Quitar de Favoritos" : "Añadir a Favoritos", systemImage: viewModel.isFavorite(movieId: movie.id) ? "heart.slash" : "heart")
+                        }
+                        if !viewModel.favoriteLists.isEmpty {
+                            ForEach(viewModel.favoriteLists) { list in
+                                Button(action: { viewModel.addMovieToList(movieId: movie.id, listId: list.id, movie: movie) }) {
+                                    Label(list.name, systemImage: "folder")
+                                }
+                            }
+                        }
+                    }
                     .padding(.horizontal, 16)
                 }
             }

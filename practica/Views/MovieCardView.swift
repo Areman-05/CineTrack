@@ -5,7 +5,7 @@ import SwiftUI
 /// Compatible con iOS 14.4.
 struct MovieCardView: View {
     let movie: Movie
-    var viewModel: MovieViewModel?
+    @ObservedObject var viewModel: MovieViewModel
     var showFavorite: Bool = false
     var showWatchStatus: Bool = false
     /// true = tarjeta más grande (póster y texto).
@@ -16,8 +16,8 @@ struct MovieCardView: View {
 
     private var subtitle: String {
         var parts = [movie.releaseYear, movie.mediaType?.displayName ?? "Película"]
-        if showWatchStatus, let vm = viewModel {
-            parts.append(vm.watchStatus(for: movie.id).displayName)
+        if showWatchStatus {
+            parts.append(viewModel.watchStatus(for: movie.id).displayName)
         }
         return parts.joined(separator: " • ")
     }
@@ -57,11 +57,11 @@ struct MovieCardView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            if showFavorite, let vm = viewModel {
-                Button(action: { vm.toggleFavorite(movieId: movie.id, movie: movie) }) {
-                    Image(systemName: vm.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
+            if showFavorite {
+                Button(action: { viewModel.toggleFavorite(movieId: movie.id, movie: movie) }) {
+                    Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
                         .font(.system(size: large ? 20 : 18))
-                        .foregroundColor(vm.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textTertiary)
+                        .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textTertiary)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
@@ -81,7 +81,7 @@ struct MovieCardView_Previews: PreviewProvider {
             VStack {
                 MovieCardView(
                     movie: Movie(id: 1, title: "Sin piedad", overview: "", posterPath: nil, voteAverage: 6.8, releaseDate: "2024-01-01", mediaType: .movie),
-                    viewModel: nil,
+                    viewModel: MovieViewModel(),
                     showFavorite: true,
                     showWatchStatus: false
                 )

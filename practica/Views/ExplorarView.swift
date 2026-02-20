@@ -12,9 +12,7 @@ struct ExplorarView: View {
             ZStack {
                 AppTheme.background.ignoresSafeArea()
 
-                RefreshableScrollView(isRefreshing: $isRefreshing, onRefresh: {
-                    viewModel.loadExploreMovies()
-                }) {
+                ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Mejor valoradas")
                             .font(AppTheme.titleMedium)
@@ -27,14 +25,24 @@ struct ExplorarView: View {
                         } else if let error = viewModel.exploreErrorMessage {
                             errorView(error)
                         } else {
-                            // Cambiamos el ForEach para que sea más estable
-                            LazyVStack(spacing: 16) {
+                            VStack(spacing: 16) {
                                 ForEach(viewModel.exploreMovies) { movie in
-                                    // Usamos un ID explícito para asegurar que SwiftUI no se pierda
                                     NavigationLink(destination: DetailView(movie: movie)) {
                                         MovieCardView(movie: movie, viewModel: viewModel, showFavorite: true, showWatchStatus: false, large: true)
                                     }
                                     .buttonStyle(PlainButtonStyle())
+                                    .contextMenu {
+                                        Button(action: { viewModel.toggleFavorite(movieId: movie.id, movie: movie) }) {
+                                            Label(viewModel.isFavorite(movieId: movie.id) ? "Quitar de Favoritos" : "Añadir a Favoritos", systemImage: viewModel.isFavorite(movieId: movie.id) ? "heart.slash" : "heart")
+                                        }
+                                        if !viewModel.favoriteLists.isEmpty {
+                                            ForEach(viewModel.favoriteLists) { list in
+                                                Button(action: { viewModel.addMovieToList(movieId: movie.id, listId: list.id, movie: movie) }) {
+                                                    Label(list.name, systemImage: "folder")
+                                                }
+                                            }
+                                        }
+                                    }
                                     .padding(.horizontal, 16)
                                 }
                             }
@@ -48,6 +56,7 @@ struct ExplorarView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
+                        isRefreshing = true
                         viewModel.loadExploreMovies()
                     }) {
                         Image(systemName: "arrow.clockwise")
@@ -60,7 +69,9 @@ struct ExplorarView: View {
                     viewModel.loadExploreMovies()
                 }
             }
-            // Eliminamos el onChange que causaba el bucle infinito
+            .onChange(of: viewModel.isLoadingExplore, perform: { loading in
+                if !loading { isRefreshing = false }
+            })
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

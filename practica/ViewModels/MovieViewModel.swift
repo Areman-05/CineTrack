@@ -111,35 +111,25 @@ class MovieViewModel: ObservableObject {
     }
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        // 1. Movemos toda la lógica al hilo principal inmediatamente
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // 2. Buscamos el índice de la lista dentro del hilo principal
-            guard let index = self.favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-            
-            // 3. Evitamos duplicados
-            if self.favoriteLists[index].movieIds.contains(movieId) { return }
-            
-            // 4. Modificamos directamente sobre la propiedad publicada
-            self.favoriteLists[index].movieIds.append(movieId)
-            
-            // 5. Guardamos y actualizamos caché
-            self.saveFavoriteLists()
-            if let m = movie {
-                self.addToCacheIfNeeded(m)
-            }
+        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
+        let newValue: [FavoriteList] = favoriteLists.map { list in
+            guard list.id == listId else { return list }
+            if list.movieIds.contains(movieId) { return list }
+            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds + [movieId])
         }
+        favoriteLists = newValue
+        saveFavoriteLists()
+        if let m = movie { addToCacheIfNeeded(m) }
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            if let index = self.favoriteLists.firstIndex(where: { $0.id == listId }) {
-                self.favoriteLists[index].movieIds.removeAll { $0 == movieId }
-                self.saveFavoriteLists()
-            }
+        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
+        let newValue: [FavoriteList] = favoriteLists.map { list in
+            guard list.id == listId else { return list }
+            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds.filter { $0 != movieId })
         }
+        favoriteLists = newValue
+        saveFavoriteLists()
     }
 
     func movies(in listId: UUID) -> [Movie] {
