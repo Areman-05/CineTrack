@@ -2,11 +2,15 @@ import Foundation
 
 // MARK: - Errores del servicio
 
-enum TMDBError: Error {
+enum TMDBError: Error, LocalizedError {
     case invalidURL
     case networkError(Error)
     case noData
     case decodingError
+
+    var errorDescription: String? {
+        localizedDescription
+    }
 
     var localizedDescription: String {
         switch self {
