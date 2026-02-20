@@ -65,7 +65,10 @@ class TMDBService {
     
     /// Descubre películas por puntuación mínima y/o género(s)
     func discoverMovies(minRating: Double?, genreIds: [Int]?, completion: @escaping (Result<[Movie], Error>) -> Void) {
-        var components = URLComponents(string: "\(baseURL)/discover/movie")
+        guard var components = URLComponents(string: "\(baseURL)/discover/movie") else {
+            completion(.failure(TMDBError.invalidURL))
+            return
+        }
         var queryItems = [
             URLQueryItem(name: "api_key", value: apiKey),
             URLQueryItem(name: "language", value: language)
