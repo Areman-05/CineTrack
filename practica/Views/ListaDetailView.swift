@@ -99,7 +99,7 @@ struct AddToListSheet: View {
                     List {
                         ForEach(favoritosNoEnLista) { movie in
                             Button(action: {
-                                viewModel.addMovieToList(movieId: movie.id, listId: listId)
+                                viewModel.addMovieToList(movieId: movie.id, listId: listId, movie: movie)
                                 presentationMode.wrappedValue.dismiss()
                             }) {
                                 HStack {

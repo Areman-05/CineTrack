@@ -78,7 +78,7 @@ struct DetailView: View {
                     // Acciones y estado
                     VStack(alignment: .leading, spacing: 14) {
                         Button(action: {
-                            viewModel.toggleFavorite(movieId: movie.id)
+                            viewModel.toggleFavorite(movieId: movie.id, movie: movie)
                         }) {
                             HStack(spacing: 10) {
                                 Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")

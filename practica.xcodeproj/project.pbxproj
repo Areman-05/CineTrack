@@ -27,6 +27,7 @@
 		EF84563B2F27BDA200D3FE74 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF84563C2F27BDA200D3FE74 /* UserProfile.swift */; };
 		EF84563D2F27BDA200D3FE74 /* ListaDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF84563E2F27BDA200D3FE74 /* ListaDetailView.swift */; };
 		EF84563F2F27BDA200D3FE74 /* PerfilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456402F27BDA200D3FE74 /* PerfilView.swift */; };
+		EF8456412F27BDA200D3FE74 /* RefreshableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456422F27BDA200D3FE74 /* RefreshableScrollView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,7 @@
 		EF84563C2F27BDA200D3FE74 /* UserProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		EF84563E2F27BDA200D3FE74 /* ListaDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListaDetailView.swift; sourceTree = "<group>"; };
 		EF8456402F27BDA200D3FE74 /* PerfilView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerfilView.swift; sourceTree = "<group>"; };
+		EF8456422F27BDA200D3FE74 /* RefreshableScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RefreshableScrollView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				EF8456302F27BDA200D3FE74 /* FavoritosView.swift */,
 				EF84563E2F27BDA200D3FE74 /* ListaDetailView.swift */,
 				EF8456402F27BDA200D3FE74 /* PerfilView.swift */,
+				EF8456422F27BDA200D3FE74 /* RefreshableScrollView.swift */,
 			);
 			name = Views;
 			path = Views;
@@ -237,6 +240,7 @@
 				EF84563B2F27BDA200D3FE74 /* UserProfile.swift in Sources */,
 				EF84563D2F27BDA200D3FE74 /* ListaDetailView.swift in Sources */,
 				EF84563F2F27BDA200D3FE74 /* PerfilView.swift in Sources */,
+				EF8456412F27BDA200D3FE74 /* RefreshableScrollView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

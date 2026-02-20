@@ -7,13 +7,16 @@ struct BuscadorPeliculasView: View {
     @State private var searchText = ""
     @State private var minRating: Double = 0
     @State private var selectedGenreId: Int?
+    @State private var isRefreshing = false
 
     var body: some View {
         NavigationView {
             ZStack {
                 AppTheme.background.ignoresSafeArea()
 
-                ScrollView {
+                RefreshableScrollView(isRefreshing: $isRefreshing, onRefresh: {
+                    aplicarFiltros()
+                }) {
                     VStack(spacing: 16) {
                         // Barra de búsqueda
                         HStack(spacing: 10) {
@@ -100,9 +103,19 @@ struct BuscadorPeliculasView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: PerfilViewContent()) {
-                        Image(systemName: "person.circle")
-                            .foregroundColor(AppTheme.accent)
+                    HStack(spacing: 16) {
+                        Button(action: {
+                            isRefreshing = true
+                            aplicarFiltros()
+                        }) {
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundColor(AppTheme.accent)
+                        }
+                        .disabled(viewModel.isLoading)
+                        NavigationLink(destination: PerfilViewContent()) {
+                            Image(systemName: "person.circle")
+                                .foregroundColor(AppTheme.accent)
+                        }
                     }
                 }
             })
@@ -110,6 +123,9 @@ struct BuscadorPeliculasView: View {
                 viewModel.loadGenres()
                 aplicarFiltros()
             }
+            .onChange(of: viewModel.isLoading, perform: { loading in
+                if !loading { isRefreshing = false }
+            })
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
@@ -128,7 +144,7 @@ struct BuscadorPeliculasView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 32)
         } else if let error = viewModel.errorMessage {
-            VStack(spacing: 12) {
+            VStack(spacing: 16) {
                 Image(systemName: "wifi.exclamationmark")
                     .font(.system(size: 44))
                     .foregroundColor(AppTheme.error)
@@ -137,6 +153,12 @@ struct BuscadorPeliculasView: View {
                     .foregroundColor(AppTheme.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
+                Button(action: { aplicarFiltros() }) {
+                    Text("Reintentar")
+                        .font(AppTheme.headline)
+                        .foregroundColor(AppTheme.accent)
+                }
+                .padding(.top, 8)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 32)

@@ -4,13 +4,16 @@ import SwiftUI
 /// Compatible con iOS 14.4.
 struct ExplorarView: View {
     @EnvironmentObject private var viewModel: MovieViewModel
+    @State private var isRefreshing = false
 
     var body: some View {
         NavigationView {
             ZStack {
                 AppTheme.background.ignoresSafeArea()
 
-                ScrollView {
+                RefreshableScrollView(isRefreshing: $isRefreshing, onRefresh: {
+                    viewModel.loadExploreMovies()
+                }) {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Mejor valoradas")
                             .font(AppTheme.titleMedium)
@@ -30,7 +33,7 @@ struct ExplorarView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 48)
                         } else if let error = viewModel.exploreErrorMessage {
-                            VStack(spacing: 12) {
+                            VStack(spacing: 16) {
                                 Image(systemName: "wifi.exclamationmark")
                                     .font(.system(size: 44))
                                     .foregroundColor(AppTheme.error)
@@ -39,6 +42,12 @@ struct ExplorarView: View {
                                     .foregroundColor(AppTheme.textSecondary)
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 32)
+                                Button(action: { viewModel.loadExploreMovies() }) {
+                                    Text("Reintentar")
+                                        .font(AppTheme.headline)
+                                        .foregroundColor(AppTheme.accent)
+                                }
+                                .padding(.top, 8)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 48)
@@ -70,7 +79,10 @@ struct ExplorarView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.loadExploreMovies() }) {
+                    Button(action: {
+                        isRefreshing = true
+                        viewModel.loadExploreMovies()
+                    }) {
                         Image(systemName: "arrow.clockwise")
                             .foregroundColor(AppTheme.accent)
                     }
@@ -82,6 +94,9 @@ struct ExplorarView: View {
                     viewModel.loadExploreMovies()
                 }
             }
+            .onChange(of: viewModel.isLoadingExplore, perform: { loading in
+                if !loading { isRefreshing = false }
+            })
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

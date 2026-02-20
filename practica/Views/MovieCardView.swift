@@ -58,7 +58,7 @@ struct MovieCardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             if showFavorite, let vm = viewModel {
-                Button(action: { vm.toggleFavorite(movieId: movie.id) }) {
+                Button(action: { vm.toggleFavorite(movieId: movie.id, movie: movie) }) {
                     Image(systemName: vm.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
                         .font(.system(size: large ? 20 : 18))
                         .foregroundColor(vm.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textTertiary)

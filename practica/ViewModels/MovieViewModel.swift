@@ -17,12 +17,38 @@ class MovieViewModel: ObservableObject {
     @Published var exploreErrorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
     @Published var favoriteLists: [FavoriteList] = []
+    /// Caché de películas (favoritas y en listas) para persistir y mostrar tras reinicio.
+    @Published var movieCache: [Movie] = []
 
     private let tmdbService = TMDBService.shared
     private let favoriteListsKey = "cineTrack.favoriteLists"
+    private let preferencesKey = "cineTrack.userPreferences"
+    private let movieCacheKey = "cineTrack.movieCache"
 
     init() {
         loadFavoriteLists()
+        loadUserPreferences()
+        loadMovieCache()
+    }
+
+    private struct SavedPreference: Codable {
+        let movieId: Int
+        let preference: UserPreference
+    }
+
+    private func loadUserPreferences() {
+        guard let data = UserDefaults.standard.data(forKey: preferencesKey),
+              let decoded = try? JSONDecoder().decode([SavedPreference].self, from: data) else {
+            userPreferences = [:]
+            return
+        }
+        userPreferences = Dictionary(uniqueKeysWithValues: decoded.map { ($0.movieId, $0.preference) })
+    }
+
+    private func saveUserPreferences() {
+        let arr = userPreferences.map { SavedPreference(movieId: $0.key, preference: $0.value) }
+        guard let data = try? JSONEncoder().encode(arr) else { return }
+        UserDefaults.standard.set(data, forKey: preferencesKey)
     }
 
     private func loadFavoriteLists() {
@@ -39,6 +65,32 @@ class MovieViewModel: ObservableObject {
         UserDefaults.standard.set(data, forKey: favoriteListsKey)
     }
 
+    private func loadMovieCache() {
+        guard let data = UserDefaults.standard.data(forKey: movieCacheKey),
+              let decoded = try? JSONDecoder().decode([Movie].self, from: data) else {
+            movieCache = []
+            return
+        }
+        movieCache = decoded
+    }
+
+    private func saveMovieCache() {
+        guard let data = try? JSONEncoder().encode(movieCache) else { return }
+        UserDefaults.standard.set(data, forKey: movieCacheKey)
+    }
+
+    private func addToCacheIfNeeded(_ movie: Movie) {
+        if !movieCache.contains(where: { $0.id == movie.id }) {
+            movieCache.append(movie)
+            saveMovieCache()
+        }
+    }
+
+    private func removeFromCache(movieId: Int) {
+        movieCache.removeAll { $0.id == movieId }
+        saveMovieCache()
+    }
+
     func addFavoriteList(name: String) {
         let list = FavoriteList(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
         guard !list.name.isEmpty else { return }
@@ -51,11 +103,12 @@ class MovieViewModel: ObservableObject {
         saveFavoriteLists()
     }
 
-    func addMovieToList(movieId: Int, listId: UUID) {
+    func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
         guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
         if !favoriteLists[i].movieIds.contains(movieId) {
             favoriteLists[i].movieIds.append(movieId)
             saveFavoriteLists()
+            if let m = movie { addToCacheIfNeeded(m) }
         }
     }
 
@@ -67,7 +120,9 @@ class MovieViewModel: ObservableObject {
 
     func movies(in listId: UUID) -> [Movie] {
         guard let list = favoriteLists.first(where: { $0.id == listId }) else { return [] }
-        return list.movieIds.compactMap { id in allLoadedMovies.first { $0.id == id } }
+        return list.movieIds.compactMap { id in
+            movieCache.first { $0.id == id } ?? allLoadedMovies.first { $0.id == id }
+        }
     }
     
     /// Carga la lista de géneros (para filtros de búsqueda)
@@ -159,15 +214,22 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    /// Marca o desmarca una película como favorita
-    func toggleFavorite(movieId: Int) {
+    /// Marca o desmarca una película como favorita. Pasar movie al marcar para guardarla en caché.
+    func toggleFavorite(movieId: Int, movie: Movie? = nil) {
         if userPreferences[movieId] == nil {
             userPreferences[movieId] = UserPreference(isFavorite: true)
+            if movie != nil { addToCacheIfNeeded(movie!) }
         } else {
+            let wasFavorite = userPreferences[movieId]?.isFavorite ?? false
             userPreferences[movieId]?.isFavorite.toggle()
+            if wasFavorite {
+                let stillInList = favoriteLists.contains { $0.movieIds.contains(movieId) }
+                if !stillInList { removeFromCache(movieId: movieId) }
+            }
         }
+        saveUserPreferences()
     }
-    
+
     /// Actualiza el estado de visualización (previsto ver, viendo, visto)
     func setWatchStatus(movieId: Int, status: WatchStatus) {
         if userPreferences[movieId] == nil {
@@ -175,8 +237,9 @@ class MovieViewModel: ObservableObject {
         } else {
             userPreferences[movieId]?.watchStatus = status
         }
+        saveUserPreferences()
     }
-    
+
     /// Actualiza la nota personal de una película/serie
     func updatePersonalNote(movieId: Int, note: String) {
         if userPreferences[movieId] == nil {
@@ -184,11 +247,16 @@ class MovieViewModel: ObservableObject {
         } else {
             userPreferences[movieId]?.personalNote = note
         }
+        saveUserPreferences()
     }
-    
+
     /// Elimina una película/serie de la lista del usuario (quitar de favoritos y preferencias)
     func removeFromList(movieId: Int) {
         userPreferences.removeValue(forKey: movieId)
+        // Quitar del caché solo si ya no está en ninguna lista
+        let stillInList = favoriteLists.contains { $0.movieIds.contains(movieId) }
+        if !stillInList { removeFromCache(movieId: movieId) }
+        saveUserPreferences()
     }
     
     func isFavorite(movieId: Int) -> Bool {
@@ -209,9 +277,12 @@ class MovieViewModel: ObservableObject {
         return (movies + popularMovies + exploreMovies).filter { seen.insert($0.id).inserted }
     }
 
-    /// Lista de favoritos del usuario (desde buscador y explorar).
+    /// Lista de favoritos (caché persistido + cargadas en sesión, sin duplicados).
     var favoriteMovies: [Movie] {
-        allLoadedMovies.filter { isFavorite(movieId: $0.id) }
+        let fromCache = movieCache.filter { isFavorite(movieId: $0.id) }
+        let cacheIds = Set(fromCache.map(\.id))
+        let fromLoaded = allLoadedMovies.filter { isFavorite(movieId: $0.id) && !cacheIds.contains($0.id) }
+        return fromCache + fromLoaded
     }
 
 }
