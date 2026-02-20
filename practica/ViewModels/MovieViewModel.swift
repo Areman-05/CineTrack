@@ -111,14 +111,12 @@ class MovieViewModel: ObservableObject {
     }
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        guard let index = favoriteLists.firstIndex(where: { $0.id == listId }),
-              index < favoriteLists.count else { return }
-        var copy = favoriteLists
-        var list = copy[index]
-        if list.movieIds.contains(movieId) { return }
-        list.movieIds.append(movieId)
-        copy[index] = list
-        let newValue = copy
+        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
+        let newValue: [FavoriteList] = favoriteLists.map { list in
+            guard list.id == listId else { return list }
+            if list.movieIds.contains(movieId) { return list }
+            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds + [movieId])
+        }
         let movieToCache = movie
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -129,13 +127,11 @@ class MovieViewModel: ObservableObject {
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
-        guard let index = favoriteLists.firstIndex(where: { $0.id == listId }),
-              index < favoriteLists.count else { return }
-        var copy = favoriteLists
-        var list = copy[index]
-        list.movieIds.removeAll { $0 == movieId }
-        copy[index] = list
-        let newValue = copy
+        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
+        let newValue: [FavoriteList] = favoriteLists.map { list in
+            guard list.id == listId else { return list }
+            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds.filter { $0 != movieId })
+        }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.favoriteLists = newValue
