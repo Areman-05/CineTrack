@@ -163,10 +163,12 @@ struct NewListSheet: View {
                         .foregroundColor(AppTheme.textSecondary)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Crear") { onCreate() }
-                        .fontWeight(.semibold)
-                        .foregroundColor(AppTheme.accent)
-                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button(action: { onCreate() }) {
+                        Text("Crear")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(AppTheme.accent)
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             })
         }
