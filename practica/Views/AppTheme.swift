@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Paleta de colores y estilos de la app. Tema oscuro tipo cine.
+/// Paleta de colores, tipografía y estilos de la app. Tema oscuro tipo cine.
 /// Compatible con iOS 14.4.
 enum AppTheme {
     // Colores
@@ -22,4 +22,14 @@ enum AppTheme {
     static let cardPadding: CGFloat = 14
     static let cardSpacing: CGFloat = 12
     static let listRowSpacing: CGFloat = 10
+
+    // Tipografía unificada
+    static let titleLarge = Font.system(size: 22, weight: .bold)
+    static let titleMedium = Font.system(size: 18, weight: .semibold)
+    static let headline = Font.system(size: 16, weight: .semibold)
+    static let body = Font.system(size: 15, weight: .regular)
+    static let bodyMedium = Font.system(size: 15, weight: .medium)
+    static let subheadline = Font.system(size: 14, weight: .regular)
+    static let caption = Font.system(size: 12, weight: .regular)
+    static let captionMedium = Font.system(size: 12, weight: .medium)
 }

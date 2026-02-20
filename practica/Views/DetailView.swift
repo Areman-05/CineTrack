@@ -26,8 +26,7 @@ struct DetailView: View {
                             .clipped()
 
                         Text(movie.mediaType?.displayName ?? "Película")
-                            .font(.caption)
-                            .fontWeight(.semibold)
+                            .font(AppTheme.captionMedium)
                             .foregroundColor(Color(red: 0.15, green: 0.12, blue: 0.02))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
@@ -41,14 +40,13 @@ struct DetailView: View {
 
                     VStack(alignment: .leading, spacing: 10) {
                         Text(movie.title)
-                            .font(.title2)
-                            .fontWeight(.bold)
+                            .font(AppTheme.titleLarge)
                             .foregroundColor(AppTheme.textPrimary)
 
                         HStack(spacing: 8) {
                             Image(systemName: "star.fill")
                                 .foregroundColor(AppTheme.accent)
-                                .font(.subheadline)
+                                .font(AppTheme.subheadline)
                             Text(String(format: "%.1f", movie.voteAverage))
                                 .foregroundColor(AppTheme.textSecondary)
                             Text("·")
@@ -56,18 +54,17 @@ struct DetailView: View {
                             Text(movie.releaseYear)
                                 .foregroundColor(AppTheme.textSecondary)
                         }
-                        .font(.subheadline)
+                        .font(AppTheme.subheadline)
                     }
                     .padding(.horizontal, 16)
 
                     if !movie.overview.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Sinopsis")
-                                .font(.caption)
-                                .fontWeight(.semibold)
+                                .font(AppTheme.captionMedium)
                                 .foregroundColor(AppTheme.textTertiary)
                             Text(movie.overview)
-                                .font(.body)
+                                .font(AppTheme.body)
                                 .foregroundColor(AppTheme.textSecondary)
                                 .lineSpacing(4)
                         }
@@ -85,9 +82,9 @@ struct DetailView: View {
                         }) {
                             HStack(spacing: 10) {
                                 Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
-                                    .font(.body)
+                                    .font(AppTheme.body)
                                 Text(viewModel.isFavorite(movieId: movie.id) ? "Quitar de Favoritos" : "Añadir a Favoritos")
-                                    .fontWeight(.medium)
+                                    .font(AppTheme.bodyMedium)
                             }
                             .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.accent)
                             .frame(maxWidth: .infinity)
@@ -99,7 +96,7 @@ struct DetailView: View {
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Estado")
-                                .font(.caption)
+                                .font(AppTheme.caption)
                                 .foregroundColor(AppTheme.textSecondary)
                             Picker("Estado", selection: $estadoVer) {
                                 ForEach(WatchStatus.allCases, id: \.self) { s in
@@ -115,9 +112,10 @@ struct DetailView: View {
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Nota personal")
-                                .font(.caption)
+                                .font(AppTheme.caption)
                                 .foregroundColor(AppTheme.textSecondary)
                             TextField("Escribe una nota...", text: $notaPersonal)
+                                .font(AppTheme.body)
                                 .foregroundColor(AppTheme.textPrimary)
                                 .padding(12)
                                 .background(AppTheme.surfaceElevated)
@@ -133,8 +131,9 @@ struct DetailView: View {
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "trash")
+                                    .font(AppTheme.body)
                                 Text("Quitar de mi lista")
-                                    .fontWeight(.medium)
+                                    .font(AppTheme.bodyMedium)
                             }
                             .foregroundColor(AppTheme.error)
                             .frame(maxWidth: .infinity)

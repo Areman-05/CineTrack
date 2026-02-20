@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Vista raíz: TabView con Inicio (Buscador) y Favoritos según prototipo.
+/// Vista raíz: TabView con Inicio (Buscador), Explorar y Favoritos.
 /// Compatible con iOS 14.4.
 struct ContentView: View {
     var body: some View {
@@ -9,6 +9,11 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "magnifyingglass")
                     Text("Inicio")
+                }
+            ExplorarView()
+                .tabItem {
+                    Image(systemName: "film.stack")
+                    Text("Explorar")
                 }
             FavoritosView()
                 .tabItem {

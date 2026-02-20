@@ -21,6 +21,8 @@
 		EF84562F2F27BDA200D3FE74 /* FavoritosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456302F27BDA200D3FE74 /* FavoritosView.swift */; };
 		EF8456312F27BDA200D3FE74 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456322F27BDA200D3FE74 /* AppTheme.swift */; };
 		EF8456332F27BDA200D3FE74 /* MovieCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456342F27BDA200D3FE74 /* MovieCardView.swift */; };
+		EF8456352F27BDA200D3FE74 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456362F27BDA200D3FE74 /* SplashView.swift */; };
+		EF8456372F27BDA200D3FE74 /* ExplorarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8456382F27BDA200D3FE74 /* ExplorarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,8 @@
 		EF8456302F27BDA200D3FE74 /* FavoritosView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritosView.swift; sourceTree = "<group>"; };
 		EF8456322F27BDA200D3FE74 /* AppTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		EF8456342F27BDA200D3FE74 /* MovieCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCardView.swift; sourceTree = "<group>"; };
+		EF8456362F27BDA200D3FE74 /* SplashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		EF8456382F27BDA200D3FE74 /* ExplorarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExplorarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +129,8 @@
 				EF8456242F27BDA200D3FE74 /* AsyncImageView.swift */,
 				EF8456342F27BDA200D3FE74 /* MovieCardView.swift */,
 				EF84562C2F27BDA200D3FE74 /* BuscadorPeliculasView.swift */,
+				EF8456382F27BDA200D3FE74 /* ExplorarView.swift */,
+				EF8456362F27BDA200D3FE74 /* SplashView.swift */,
 				EF84562E2F27BDA200D3FE74 /* DetailView.swift */,
 				EF8456302F27BDA200D3FE74 /* FavoritosView.swift */,
 			);
@@ -213,6 +219,8 @@
 				EF84562F2F27BDA200D3FE74 /* FavoritosView.swift in Sources */,
 				EF8456312F27BDA200D3FE74 /* AppTheme.swift in Sources */,
 				EF8456332F27BDA200D3FE74 /* MovieCardView.swift in Sources */,
+				EF8456352F27BDA200D3FE74 /* SplashView.swift in Sources */,
+				EF8456372F27BDA200D3FE74 /* ExplorarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

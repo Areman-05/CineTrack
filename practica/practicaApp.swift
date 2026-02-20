@@ -3,11 +3,25 @@ import SwiftUI
 @main
 struct practicaApp: App {
     @StateObject private var viewModel = MovieViewModel()
-    
+    @State private var showSplash = true
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(viewModel)
+            Group {
+                if showSplash {
+                    SplashView()
+                } else {
+                    ContentView()
+                }
+            }
+            .environmentObject(viewModel)
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        showSplash = false
+                    }
+                }
+            }
         }
     }
 }

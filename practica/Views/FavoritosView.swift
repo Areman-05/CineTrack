@@ -17,11 +17,10 @@ struct FavoritosView: View {
                             .font(.system(size: 56))
                             .foregroundColor(AppTheme.textTertiary)
                         Text("No tienes favoritos")
-                            .font(.title3)
-                            .fontWeight(.semibold)
+                            .font(AppTheme.titleMedium)
                             .foregroundColor(AppTheme.textPrimary)
-                        Text("Marca como favorito en Inicio para verlos aquí.")
-                            .font(.subheadline)
+                        Text("Marca como favorito en Inicio o Explorar para verlos aquí.")
+                            .font(AppTheme.subheadline)
                             .foregroundColor(AppTheme.textSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)
@@ -31,7 +30,7 @@ struct FavoritosView: View {
                     List {
                         ForEach(viewModel.favoriteMovies) { movie in
                             NavigationLink(destination: DetailView(movie: movie)) {
-                                MovieCardView(movie: movie, viewModel: viewModel, showFavorite: false, showWatchStatus: true)
+                                MovieCardView(movie: movie, viewModel: viewModel, showFavorite: false, showWatchStatus: true, large: true)
                             }
                             .listRowBackground(AppTheme.background)
                             .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))

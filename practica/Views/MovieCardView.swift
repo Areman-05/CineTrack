@@ -6,10 +6,13 @@ import SwiftUI
 struct MovieCardView: View {
     let movie: Movie
     var viewModel: MovieViewModel?
-    /// true en Buscador: muestra botón favorito.
     var showFavorite: Bool = false
-    /// true en Favoritos: muestra estado (Previsto ver / Viendo / Visto).
     var showWatchStatus: Bool = false
+    /// true = tarjeta más grande (póster y texto).
+    var large: Bool = false
+
+    private var posterWidth: CGFloat { large ? 100 : 72 }
+    private var posterHeight: CGFloat { large ? 150 : 108 }
 
     private var subtitle: String {
         var parts = [movie.releaseYear, movie.mediaType?.displayName ?? "Película"]
@@ -21,10 +24,9 @@ struct MovieCardView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: AppTheme.cardSpacing) {
-            // Póster
             AsyncImageView(url: movie.posterURL)
                 .aspectRatio(2/3, contentMode: .fill)
-                .frame(width: 72, height: 108)
+                .frame(width: posterWidth, height: posterHeight)
                 .clipped()
                 .cornerRadius(AppTheme.posterCornerRadius)
                 .overlay(
@@ -34,24 +36,22 @@ struct MovieCardView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(movie.title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .font(large ? AppTheme.headline : AppTheme.subheadline)
                     .foregroundColor(AppTheme.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
 
                 Text(subtitle)
-                    .font(.caption)
+                    .font(AppTheme.caption)
                     .foregroundColor(AppTheme.textSecondary)
                     .lineLimit(1)
 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
-                        .font(.caption2)
+                        .font(large ? .caption : .caption2)
                         .foregroundColor(AppTheme.accent)
                     Text(String(format: "%.1f", movie.voteAverage))
-                        .font(.caption)
-                        .fontWeight(.medium)
+                        .font(AppTheme.captionMedium)
                         .foregroundColor(AppTheme.textSecondary)
                 }
             }
@@ -60,13 +60,13 @@ struct MovieCardView: View {
             if showFavorite, let vm = viewModel {
                 Button(action: { vm.toggleFavorite(movieId: movie.id) }) {
                     Image(systemName: vm.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
-                        .font(.system(size: 18))
+                        .font(.system(size: large ? 20 : 18))
                         .foregroundColor(vm.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textTertiary)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(AppTheme.cardPadding)
+        .padding(large ? 16 : AppTheme.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppTheme.surface)
         .cornerRadius(AppTheme.cardCornerRadius)

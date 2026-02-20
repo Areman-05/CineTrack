@@ -5,9 +5,12 @@ import SwiftUI
 /// Implementa el patrón MVVM siguiendo las directrices de teoría
 class MovieViewModel: ObservableObject {
     @Published var movies: [Movie] = []
+    @Published var popularMovies: [Movie] = []
     @Published var genres: [Genre] = []
     @Published var isLoading = false
+    @Published var isLoadingPopular = false
     @Published var errorMessage: String?
+    @Published var popularErrorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
     
     private let tmdbService = TMDBService.shared
@@ -26,19 +29,18 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    /// Carga las películas populares desde TMDB
+    /// Carga las películas populares (para la pestaña Explorar).
     func loadPopularMovies() {
-        isLoading = true
-        errorMessage = nil
-        
+        isLoadingPopular = true
+        popularErrorMessage = nil
         tmdbService.fetchPopularMovies { [weak self] result in
             DispatchQueue.main.async {
-                self?.isLoading = false
+                self?.isLoadingPopular = false
                 switch result {
                 case .success(let movies):
-                    self?.movies = movies
+                    self?.popularMovies = movies
                 case .failure(let error):
-                    self?.errorMessage = "Error al cargar películas: \(error.localizedDescription)"
+                    self?.popularErrorMessage = "Error al cargar: \(error.localizedDescription)"
                 }
             }
         }
@@ -129,8 +131,14 @@ class MovieViewModel: ObservableObject {
         return userPreferences[movieId]?.personalNote ?? ""
     }
     
-    /// Lista de favoritos del usuario
+    /// Todas las películas cargadas (buscador + populares) sin duplicados por id.
+    private var allLoadedMovies: [Movie] {
+        var seen = Set<Int>()
+        return (movies + popularMovies).filter { seen.insert($0.id).inserted }
+    }
+
+    /// Lista de favoritos del usuario (desde buscador y explorar).
     var favoriteMovies: [Movie] {
-        movies.filter { isFavorite(movieId: $0.id) }
+        allLoadedMovies.filter { isFavorite(movieId: $0.id) }
     }
 }
