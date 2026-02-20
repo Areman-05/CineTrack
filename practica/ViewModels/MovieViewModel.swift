@@ -6,14 +6,69 @@ import SwiftUI
 class MovieViewModel: ObservableObject {
     @Published var movies: [Movie] = []
     @Published var popularMovies: [Movie] = []
+    /// Películas para Explorar (mejor valoradas), distinto del discover de Inicio.
+    @Published var exploreMovies: [Movie] = []
     @Published var genres: [Genre] = []
     @Published var isLoading = false
     @Published var isLoadingPopular = false
+    @Published var isLoadingExplore = false
     @Published var errorMessage: String?
     @Published var popularErrorMessage: String?
+    @Published var exploreErrorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
-    
+    @Published var favoriteLists: [FavoriteList] = []
+
     private let tmdbService = TMDBService.shared
+    private let favoriteListsKey = "cineTrack.favoriteLists"
+
+    init() {
+        loadFavoriteLists()
+    }
+
+    private func loadFavoriteLists() {
+        guard let data = UserDefaults.standard.data(forKey: favoriteListsKey),
+              let decoded = try? JSONDecoder().decode([FavoriteList].self, from: data) else {
+            favoriteLists = []
+            return
+        }
+        favoriteLists = decoded
+    }
+
+    private func saveFavoriteLists() {
+        guard let data = try? JSONEncoder().encode(favoriteLists) else { return }
+        UserDefaults.standard.set(data, forKey: favoriteListsKey)
+    }
+
+    func addFavoriteList(name: String) {
+        let list = FavoriteList(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard !list.name.isEmpty else { return }
+        favoriteLists.append(list)
+        saveFavoriteLists()
+    }
+
+    func removeFavoriteList(id: UUID) {
+        favoriteLists.removeAll { $0.id == id }
+        saveFavoriteLists()
+    }
+
+    func addMovieToList(movieId: Int, listId: UUID) {
+        guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
+        if !favoriteLists[i].movieIds.contains(movieId) {
+            favoriteLists[i].movieIds.append(movieId)
+            saveFavoriteLists()
+        }
+    }
+
+    func removeMovieFromList(movieId: Int, listId: UUID) {
+        guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
+        favoriteLists[i].movieIds.removeAll { $0 == movieId }
+        saveFavoriteLists()
+    }
+
+    func movies(in listId: UUID) -> [Movie] {
+        guard let list = favoriteLists.first(where: { $0.id == listId }) else { return [] }
+        return list.movieIds.compactMap { id in allLoadedMovies.first { $0.id == id } }
+    }
     
     /// Carga la lista de géneros (para filtros de búsqueda)
     func loadGenres() {
@@ -29,7 +84,7 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    /// Carga las películas populares (para la pestaña Explorar).
+    /// Carga las películas populares (reservado si se usa en otro sitio).
     func loadPopularMovies() {
         isLoadingPopular = true
         popularErrorMessage = nil
@@ -41,6 +96,23 @@ class MovieViewModel: ObservableObject {
                     self?.popularMovies = movies
                 case .failure(let error):
                     self?.popularErrorMessage = "Error al cargar: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
+
+    /// Carga películas mejor valoradas para la pestaña Explorar (diferente a Inicio).
+    func loadExploreMovies() {
+        isLoadingExplore = true
+        exploreErrorMessage = nil
+        tmdbService.fetchTopRatedMovies { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoadingExplore = false
+                switch result {
+                case .success(let movies):
+                    self?.exploreMovies = movies
+                case .failure(let error):
+                    self?.exploreErrorMessage = "Error al cargar: \(error.localizedDescription)"
                 }
             }
         }
@@ -131,14 +203,15 @@ class MovieViewModel: ObservableObject {
         return userPreferences[movieId]?.personalNote ?? ""
     }
     
-    /// Todas las películas cargadas (buscador + populares) sin duplicados por id.
-    private var allLoadedMovies: [Movie] {
+    /// Todas las películas cargadas (buscador + populares + explorar) sin duplicados por id.
+    var allLoadedMovies: [Movie] {
         var seen = Set<Int>()
-        return (movies + popularMovies).filter { seen.insert($0.id).inserted }
+        return (movies + popularMovies + exploreMovies).filter { seen.insert($0.id).inserted }
     }
 
     /// Lista de favoritos del usuario (desde buscador y explorar).
     var favoriteMovies: [Movie] {
         allLoadedMovies.filter { isFavorite(movieId: $0.id) }
     }
+
 }

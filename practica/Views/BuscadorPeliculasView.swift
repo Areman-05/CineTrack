@@ -98,6 +98,14 @@ struct BuscadorPeliculasView: View {
             }
             .navigationTitle("Buscador")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar(content: {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: PerfilViewContent()) {
+                        Image(systemName: "person.circle")
+                            .foregroundColor(AppTheme.accent)
+                    }
+                }
+            })
             .onAppear {
                 viewModel.loadGenres()
                 aplicarFiltros()

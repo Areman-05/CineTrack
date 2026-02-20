@@ -12,13 +12,18 @@ struct ContentView: View {
                 }
             ExplorarView()
                 .tabItem {
-                    Image(systemName: "film.stack")
+                    Image(systemName: "square.grid.2x2")
                     Text("Explorar")
                 }
             FavoritosView()
                 .tabItem {
                     Image(systemName: "heart.fill")
                     Text("Favoritos")
+                }
+            PerfilView()
+                .tabItem {
+                    Image(systemName: "person.circle.fill")
+                    Text("Perfil")
                 }
         }
         .accentColor(AppTheme.accent)
@@ -30,5 +35,6 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(MovieViewModel())
+            .environmentObject(UserProfileStore())
     }
 }

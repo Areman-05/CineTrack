@@ -35,7 +35,15 @@ class TMDBService {
             completion(.failure(TMDBError.invalidURL))
             return
         }
-        
+        performRequest(url: url, completion: completion)
+    }
+
+    /// Obtiene las películas mejor valoradas (para Explorar, distinto de discover de Inicio).
+    func fetchTopRatedMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {
+        guard let url = URL(string: "\(baseURL)/movie/top_rated?api_key=\(apiKey)&language=\(language)") else {
+            completion(.failure(TMDBError.invalidURL))
+            return
+        }
         performRequest(url: url, completion: completion)
     }
     

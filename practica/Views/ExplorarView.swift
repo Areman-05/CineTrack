@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Vista Explorar: películas populares. Todo el contenido es scrollable.
+/// Vista Explorar: películas mejor valoradas (diferente a Inicio). Con refresh.
 /// Compatible con iOS 14.4.
 struct ExplorarView: View {
     @EnvironmentObject private var viewModel: MovieViewModel
@@ -12,13 +12,13 @@ struct ExplorarView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Películas populares")
+                        Text("Mejor valoradas")
                             .font(AppTheme.titleMedium)
                             .foregroundColor(AppTheme.textPrimary)
                             .padding(.horizontal, 16)
                             .padding(.top, 8)
 
-                        if viewModel.isLoadingPopular {
+                        if viewModel.isLoadingExplore {
                             VStack(spacing: 12) {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.accent))
@@ -29,7 +29,7 @@ struct ExplorarView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 48)
-                        } else if let error = viewModel.popularErrorMessage {
+                        } else if let error = viewModel.exploreErrorMessage {
                             VStack(spacing: 12) {
                                 Image(systemName: "wifi.exclamationmark")
                                     .font(.system(size: 44))
@@ -42,19 +42,19 @@ struct ExplorarView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 48)
-                        } else if viewModel.popularMovies.isEmpty {
+                        } else if viewModel.exploreMovies.isEmpty {
                             VStack(spacing: 12) {
-                                Image(systemName: "film.stack")
+                                Image(systemName: "star.circle")
                                     .font(.system(size: 44))
                                     .foregroundColor(AppTheme.textTertiary)
-                                Text("No hay películas populares")
+                                Text("Pulsa Actualizar para cargar películas")
                                     .font(AppTheme.subheadline)
                                     .foregroundColor(AppTheme.textSecondary)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 48)
                         } else {
-                            ForEach(viewModel.popularMovies) { movie in
+                            ForEach(viewModel.exploreMovies) { movie in
                                 NavigationLink(destination: DetailView(movie: movie)) {
                                     MovieCardView(movie: movie, viewModel: viewModel, showFavorite: true, showWatchStatus: false, large: true)
                                 }
@@ -68,9 +68,18 @@ struct ExplorarView: View {
             }
             .navigationTitle("Explorar")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar(content: {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { viewModel.loadExploreMovies() }) {
+                        Image(systemName: "arrow.clockwise")
+                            .foregroundColor(AppTheme.accent)
+                    }
+                    .disabled(viewModel.isLoadingExplore)
+                }
+            })
             .onAppear {
-                if viewModel.popularMovies.isEmpty && !viewModel.isLoadingPopular {
-                    viewModel.loadPopularMovies()
+                if viewModel.exploreMovies.isEmpty && !viewModel.isLoadingExplore {
+                    viewModel.loadExploreMovies()
                 }
             }
         }
