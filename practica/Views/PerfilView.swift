@@ -3,7 +3,6 @@ import SwiftUI
 struct PerfilView: View {
     @EnvironmentObject var viewModel: MovieViewModel
     @EnvironmentObject var profileStore: UserProfileStore
-    @State private var showCreatePassword = false
     @State private var showLogin = false
 
     var body: some View {
@@ -13,18 +12,18 @@ struct PerfilView: View {
 
                     ZStack {
                         Circle()
-                            .fill(Color(.secondarySystemBackground))
+                            .fill(AppTheme.surface)
                             .frame(width: 80, height: 80)
                         Image(systemName: "person.fill")
                             .font(.system(size: 36))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppTheme.textTertiary)
                     }
                     .padding(.top)
 
                     if !profileStore.profile.displayName.isEmpty {
                         Text(profileStore.profile.displayName)
-                            .font(.title2)
-                            .fontWeight(.semibold)
+                            .font(AppTheme.titleMedium)
+                            .foregroundColor(AppTheme.textPrimary)
                     }
 
                     HStack(spacing: 16) {
@@ -32,139 +31,76 @@ struct PerfilView: View {
                             Text("\(viewModel.favoriteMovies.count)")
                                 .font(.title)
                                 .fontWeight(.bold)
+                                .foregroundColor(AppTheme.accent)
                             Text("Favoritos")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                                .font(AppTheme.caption)
+                                .foregroundColor(AppTheme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(12)
+                        .background(AppTheme.surface)
+                        .cornerRadius(AppTheme.cardCornerRadius)
 
                         VStack {
                             Text("\(viewModel.favoriteLists.count)")
                                 .font(.title)
                                 .fontWeight(.bold)
+                                .foregroundColor(AppTheme.accent)
                             Text("Listas")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                                .font(AppTheme.caption)
+                                .foregroundColor(AppTheme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(12)
+                        .background(AppTheme.surface)
+                        .cornerRadius(AppTheme.cardCornerRadius)
                     }
                     .padding(.horizontal)
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Cuenta")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
+                    if profileStore.profile.hasPassword {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Cuenta")
+                                .font(AppTheme.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppTheme.textTertiary)
+                                .padding(.horizontal)
 
-                        if !profileStore.profile.hasPassword {
-                            Button("Crear contraseña") {
-                                showCreatePassword = true
+                            if !profileStore.profile.isLoggedIn {
+                                Button("Iniciar sesión") {
+                                    showLogin = true
+                                }
+                                .font(AppTheme.bodyMedium)
+                                .foregroundColor(AppTheme.accent)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(AppTheme.surface)
+                                .cornerRadius(AppTheme.cardCornerRadius)
+                                .padding(.horizontal)
+                            } else {
+                                Button("Cerrar sesión") {
+                                    profileStore.logout()
+                                }
+                                .font(AppTheme.bodyMedium)
+                                .foregroundColor(AppTheme.error)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(AppTheme.surface)
+                                .cornerRadius(AppTheme.cardCornerRadius)
+                                .padding(.horizontal)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                        } else if !profileStore.profile.isLoggedIn {
-                            Button("Iniciar sesión") {
-                                showLogin = true
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                        } else {
-                            Button("Cerrar sesión") {
-                                profileStore.logout()
-                            }
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(12)
-                            .padding(.horizontal)
                         }
                     }
 
                     Spacer()
                 }
             }
+            .background(AppTheme.background.ignoresSafeArea())
             .navigationTitle("Perfil")
-            .sheet(isPresented: $showCreatePassword) {
-                CreatePasswordSheet(profileStore: profileStore)
-            }
             .sheet(isPresented: $showLogin) {
                 LoginSheet(profileStore: profileStore)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
-    }
-}
-
-struct CreatePasswordSheet: View {
-    @ObservedObject var profileStore: UserProfileStore
-    @Environment(\.presentationMode) var presentationMode
-    @State private var name = ""
-    @State private var password = ""
-    @State private var confirm = ""
-    @State private var errorMessage = ""
-
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 16) {
-                TextField("Nombre (opcional)", text: $name)
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
-
-                SecureField("Contraseña", text: $password)
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
-
-                SecureField("Repetir contraseña", text: $confirm)
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
-
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .font(.caption)
-                }
-
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("Crear contraseña")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancelar") { presentationMode.wrappedValue.dismiss() }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        if password != confirm {
-                            errorMessage = "Las contraseñas no coinciden"
-                        } else if password.count < 4 {
-                            errorMessage = "Mínimo 4 caracteres"
-                        } else {
-                            profileStore.createAccount(name: name, password: password)
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }) {
-                        Text("Guardar").fontWeight(.semibold)
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -179,18 +115,20 @@ struct LoginSheet: View {
             VStack(spacing: 16) {
                 SecureField("Contraseña", text: $password)
                     .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
+                    .background(AppTheme.surface)
+                    .foregroundColor(AppTheme.textPrimary)
+                    .cornerRadius(AppTheme.posterCornerRadius)
 
                 if showError {
                     Text("Contraseña incorrecta")
-                        .foregroundColor(.red)
-                        .font(.caption)
+                        .foregroundColor(AppTheme.error)
+                        .font(AppTheme.caption)
                 }
 
                 Spacer()
             }
             .padding()
+            .background(AppTheme.background.ignoresSafeArea())
             .navigationTitle("Iniciar sesión")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

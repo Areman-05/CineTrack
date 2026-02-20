@@ -9,48 +9,51 @@ struct DetailView: View {
     @State private var estado: WatchStatus = .toWatch
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+        ZStack {
+            AppTheme.background.ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
 
-                AsyncImageView(url: movie.posterURL)
-                    .aspectRatio(2/3, contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 280)
-                    .clipped()
-                    .cornerRadius(12)
-                    .padding(.horizontal)
+                    AsyncImageView(url: movie.posterURL)
+                        .aspectRatio(2/3, contentMode: .fill)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 280)
+                        .clipped()
+                        .cornerRadius(AppTheme.cardCornerRadius)
+                        .padding(.horizontal)
 
                 VStack(alignment: .leading, spacing: 8) {
 
                     Text(movie.title)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(AppTheme.titleLarge)
+                        .foregroundColor(AppTheme.textPrimary)
 
                     HStack(spacing: 6) {
                         Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
+                            .foregroundColor(AppTheme.accent)
                         Text(String(format: "%.1f", movie.voteAverage))
                         Text("·")
                         Text(movie.releaseYear)
                         Text("·")
                         Text(movie.mediaType?.displayName ?? "Película")
                     }
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(AppTheme.subheadline)
+                    .foregroundColor(AppTheme.textSecondary)
                 }
                 .padding(.horizontal)
 
                 if !movie.overview.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Sinopsis")
-                            .font(.headline)
+                            .font(AppTheme.headline)
+                            .foregroundColor(AppTheme.textPrimary)
                         Text(movie.overview)
-                            .font(.body)
-                            .foregroundColor(.secondary)
+                            .font(AppTheme.body)
+                            .foregroundColor(AppTheme.textSecondary)
                     }
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(12)
+                    .padding(AppTheme.cardPadding)
+                    .background(AppTheme.surface)
+                    .cornerRadius(AppTheme.cardCornerRadius)
                     .padding(.horizontal)
                 }
 
@@ -65,16 +68,16 @@ struct DetailView: View {
                         )
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? .red : .primary)
-                        .cornerRadius(12)
+                        .background(AppTheme.surface)
+                        .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textPrimary)
+                        .cornerRadius(AppTheme.cardCornerRadius)
                     }
                     .buttonStyle(PlainButtonStyle())
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Estado")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .font(AppTheme.subheadline)
+                            .foregroundColor(AppTheme.textSecondary)
                         Picker("Estado", selection: $estado) {
                             ForEach(WatchStatus.allCases, id: \.self) { s in
                                 Text(s.displayName).tag(s)
@@ -88,12 +91,14 @@ struct DetailView: View {
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Nota personal")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .font(AppTheme.subheadline)
+                            .foregroundColor(AppTheme.textSecondary)
                         TextField("Escribe una nota...", text: $nota)
+                            .font(AppTheme.body)
+                            .foregroundColor(AppTheme.textPrimary)
                             .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(10)
+                            .background(AppTheme.surface)
+                            .cornerRadius(AppTheme.posterCornerRadius)
                             .onChange(of: nota, perform: { newValue in
                                 viewModel.updatePersonalNote(movieId: movie.id, note: newValue)
                             })
@@ -102,8 +107,8 @@ struct DetailView: View {
                     if !viewModel.favoriteLists.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Mis listas")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .font(AppTheme.subheadline)
+                                .foregroundColor(AppTheme.textSecondary)
                             ForEach(viewModel.favoriteLists) { list in
                                 Button(action: {
                                     if viewModel.isInList(movieId: movie.id, listId: list.id) {
@@ -114,14 +119,14 @@ struct DetailView: View {
                                 }) {
                                     HStack {
                                         Image(systemName: viewModel.isInList(movieId: movie.id, listId: list.id) ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(viewModel.isInList(movieId: movie.id, listId: list.id) ? .blue : .secondary)
+                                            .foregroundColor(viewModel.isInList(movieId: movie.id, listId: list.id) ? AppTheme.accent : AppTheme.textTertiary)
                                         Text(list.name)
-                                            .foregroundColor(.primary)
+                                            .foregroundColor(AppTheme.textPrimary)
                                         Spacer()
                                     }
                                     .padding()
-                                    .background(Color(.secondarySystemBackground))
-                                    .cornerRadius(10)
+                                    .background(AppTheme.surface)
+                                    .cornerRadius(AppTheme.posterCornerRadius)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -131,6 +136,7 @@ struct DetailView: View {
                 .padding(.horizontal)
             }
             .padding(.vertical)
+        }
         }
         .navigationTitle(movie.title)
         .navigationBarTitleDisplayMode(.inline)

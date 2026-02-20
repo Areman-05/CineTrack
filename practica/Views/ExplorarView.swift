@@ -5,48 +5,57 @@ struct ExplorarView: View {
 
     var body: some View {
         NavigationView {
-            Group {
-                if viewModel.isLoadingExplore {
-                    ProgressView("Cargando...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let error = viewModel.exploreErrorMessage {
-                    VStack(spacing: 16) {
-                        Text(error)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        Button("Reintentar") {
-                            viewModel.loadExploreMovies()
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
-                } else if viewModel.exploreMovies.isEmpty {
-                    Text("Pulsa Actualizar para cargar películas.")
-                        .foregroundColor(.secondary)
-                } else {
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            ForEach(viewModel.exploreMovies) { movie in
-                                NavigationLink(destination: DetailView(movie: movie)) {
-                                    MovieCardView(movie: movie)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                .padding(.horizontal)
+            ZStack {
+                AppTheme.background.ignoresSafeArea()
+                Group {
+                    if viewModel.isLoadingExplore {
+                        ProgressView("Cargando...")
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.accent))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if let error = viewModel.exploreErrorMessage {
+                        VStack(spacing: 16) {
+                            Text(error)
+                                .font(AppTheme.body)
+                                .foregroundColor(AppTheme.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding()
+                            Button("Reintentar") {
+                                viewModel.loadExploreMovies()
                             }
+                            .font(AppTheme.headline)
+                            .foregroundColor(Color(red: 0.12, green: 0.10, blue: 0.04))
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 10)
+                            .background(AppTheme.accent)
+                            .cornerRadius(AppTheme.posterCornerRadius)
                         }
-                        .padding(.vertical)
+                    } else if viewModel.exploreMovies.isEmpty {
+                        Text("Pulsa Actualizar para cargar películas.")
+                            .font(AppTheme.subheadline)
+                            .foregroundColor(AppTheme.textSecondary)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach(viewModel.exploreMovies) { movie in
+                                    NavigationLink(destination: DetailView(movie: movie)) {
+                                        MovieCardView(movie: movie)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    .padding(.horizontal)
+                                }
+                            }
+                            .padding(.vertical)
+                        }
                     }
                 }
             }
             .navigationTitle("Explorar")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.loadExploreMovies() }) {
                         Image(systemName: "arrow.clockwise")
+                            .foregroundColor(AppTheme.accent)
                     }
                     .disabled(viewModel.isLoadingExplore)
                 }

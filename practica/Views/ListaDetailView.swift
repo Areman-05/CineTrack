@@ -10,35 +10,40 @@ struct ListaDetailView: View {
     }
 
     var body: some View {
-        Group {
-            if peliculasEnLista.isEmpty {
-                VStack(spacing: 16) {
-                    Image(systemName: "tray")
-                        .font(.system(size: 44))
-                        .foregroundColor(.secondary)
-                    Text("Lista vacía")
-                        .font(.headline)
-                    Text("Añade películas desde el botón +.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    ForEach(peliculasEnLista) { movie in
-                        NavigationLink(destination: DetailView(movie: movie)) {
-                            MovieCardView(movie: movie)
-                        }
-                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+        ZStack {
+            AppTheme.background.ignoresSafeArea()
+            Group {
+                if peliculasEnLista.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "tray")
+                            .font(.system(size: 44))
+                            .foregroundColor(AppTheme.textTertiary)
+                        Text("Lista vacía")
+                            .font(AppTheme.headline)
+                            .foregroundColor(AppTheme.textPrimary)
+                        Text("Añade películas desde el botón +.")
+                            .font(AppTheme.caption)
+                            .foregroundColor(AppTheme.textSecondary)
                     }
-                    .onDelete { offsets in
-                        for index in offsets {
-                            let movie = peliculasEnLista[index]
-                            viewModel.removeMovieFromList(movieId: movie.id, listId: list.id)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List {
+                        ForEach(peliculasEnLista) { movie in
+                            NavigationLink(destination: DetailView(movie: movie)) {
+                                MovieCardView(movie: movie)
+                            }
+                            .listRowBackground(AppTheme.surface)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        }
+                        .onDelete { offsets in
+                            for index in offsets {
+                                let movie = peliculasEnLista[index]
+                                viewModel.removeMovieFromList(movieId: movie.id, listId: list.id)
+                            }
                         }
                     }
+                    .listStyle(PlainListStyle())
                 }
-                .listStyle(PlainListStyle())
             }
         }
         .navigationTitle(list.name)
@@ -47,6 +52,7 @@ struct ListaDetailView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showAddSheet = true }) {
                     Image(systemName: "plus")
+                        .foregroundColor(AppTheme.accent)
                 }
                 .disabled(viewModel.todasLasPeliculas.isEmpty)
             }
@@ -72,30 +78,36 @@ struct AddToListSheet: View {
 
     var body: some View {
         NavigationView {
-            Group {
-                if disponibles.isEmpty {
-                    Text("Todas las películas disponibles ya están en esta lista.")
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List(disponibles) { movie in
-                        Button(action: {
-                            viewModel.addMovieToList(movieId: movie.id, listId: listId, movie: movie)
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                Text(movie.title)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Image(systemName: "plus.circle")
-                                    .foregroundColor(.blue)
+            ZStack {
+                AppTheme.background.ignoresSafeArea()
+                Group {
+                    if disponibles.isEmpty {
+                        Text("Todas las películas disponibles ya están en esta lista.")
+                            .font(AppTheme.body)
+                            .foregroundColor(AppTheme.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        List(disponibles) { movie in
+                            Button(action: {
+                                viewModel.addMovieToList(movieId: movie.id, listId: listId, movie: movie)
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack {
+                                    Text(movie.title)
+                                        .font(AppTheme.body)
+                                        .foregroundColor(AppTheme.textPrimary)
+                                    Spacer()
+                                    Image(systemName: "plus.circle")
+                                        .foregroundColor(AppTheme.accent)
+                                }
+                                .padding(.vertical, 4)
                             }
-                            .padding(.vertical, 4)
+                            .listRowBackground(AppTheme.surface)
                         }
+                        .listStyle(PlainListStyle())
                     }
-                    .listStyle(PlainListStyle())
                 }
             }
             .navigationTitle("Añadir a lista")
@@ -103,6 +115,7 @@ struct AddToListSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Cerrar") { presentationMode.wrappedValue.dismiss() }
+                        .foregroundColor(AppTheme.accent)
                 }
             }
         }

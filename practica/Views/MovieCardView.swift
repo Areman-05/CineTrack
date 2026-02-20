@@ -10,24 +10,25 @@ struct MovieCardView: View {
                 .aspectRatio(2/3, contentMode: .fill)
                 .frame(width: 80, height: 120)
                 .clipped()
-                .cornerRadius(8)
+                .cornerRadius(AppTheme.posterCornerRadius)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(movie.title)
-                    .font(.headline)
+                    .font(AppTheme.headline)
+                    .foregroundColor(AppTheme.textPrimary)
                     .lineLimit(2)
 
                 Text("\(movie.releaseYear) · \(movie.mediaType?.displayName ?? "Película")")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(AppTheme.caption)
+                    .foregroundColor(AppTheme.textSecondary)
 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                        .font(.caption)
+                        .foregroundColor(AppTheme.accent)
+                        .font(AppTheme.caption)
                     Text(String(format: "%.1f", movie.voteAverage))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(AppTheme.captionMedium)
+                        .foregroundColor(AppTheme.textSecondary)
                 }
 
                 Spacer()
@@ -36,15 +37,15 @@ struct MovieCardView: View {
                     viewModel.toggleFavorite(movie: movie)
                 }) {
                     Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
-                        .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? .red : .gray)
+                        .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textTertiary)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .padding(AppTheme.cardPadding)
+        .background(AppTheme.surface)
+        .cornerRadius(AppTheme.cardCornerRadius)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }

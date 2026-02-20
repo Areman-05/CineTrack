@@ -20,6 +20,8 @@ struct ContentView: View {
                     Label("Perfil", systemImage: "person.circle.fill")
                 }
         }
+        .accentColor(AppTheme.accent)
+        .preferredColorScheme(.dark)
     }
 }
 
