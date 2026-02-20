@@ -111,28 +111,27 @@ class MovieViewModel: ObservableObject {
     }
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            guard let i = self.favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-            var list = self.favoriteLists[i]
-            if !list.movieIds.contains(movieId) {
-                list.movieIds.append(movieId)
-                self.favoriteLists[i] = list
-                self.saveFavoriteLists()
-                if let m = movie { self.addToCacheIfNeeded(m) }
-            }
-        }
+        guard let index = favoriteLists.firstIndex(where: { $0.id == listId }),
+              index < favoriteLists.count else { return }
+        var copy = favoriteLists
+        var list = copy[index]
+        if list.movieIds.contains(movieId) { return }
+        list.movieIds.append(movieId)
+        copy[index] = list
+        favoriteLists = copy
+        saveFavoriteLists()
+        if let m = movie { addToCacheIfNeeded(m) }
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            guard let i = self.favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-            var list = self.favoriteLists[i]
-            list.movieIds.removeAll { $0 == movieId }
-            self.favoriteLists[i] = list
-            self.saveFavoriteLists()
-        }
+        guard let index = favoriteLists.firstIndex(where: { $0.id == listId }),
+              index < favoriteLists.count else { return }
+        var copy = favoriteLists
+        var list = copy[index]
+        list.movieIds.removeAll { $0 == movieId }
+        copy[index] = list
+        favoriteLists = copy
+        saveFavoriteLists()
     }
 
     func movies(in listId: UUID) -> [Movie] {
