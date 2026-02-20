@@ -145,15 +145,17 @@ struct FavoritosView: View {
                     .foregroundColor(AppTheme.textSecondary)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Crear") {
+                    Button(action: {
                         if !newListName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                             viewModel.addFavoriteList(name: newListName)
                             newListName = ""
                             showNewListSheet = false
                         }
+                    }) {
+                        Text("Crear")
+                            .fontWeight(.semibold)
                     }
                     .foregroundColor(AppTheme.accent)
-                    .fontWeight(.semibold)
                     .disabled(newListName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
