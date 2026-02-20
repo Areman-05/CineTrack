@@ -75,8 +75,8 @@ struct BuscadorPeliculasView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "magnifyingglass")
                                 .font(.subheadline)
-                                .fontWeight(.semibold)
                             Text("Buscar")
+                                .font(.subheadline)
                                 .fontWeight(.semibold)
                         }
                         .foregroundColor(Color(red: 0.12, green: 0.10, blue: 0.04))
