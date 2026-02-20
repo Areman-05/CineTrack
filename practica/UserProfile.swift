@@ -1,35 +1,34 @@
 import Foundation
 
-/// Perfil de usuario local (nombre, contraseña). Persistido en UserDefaults / Keychain.
-struct UserProfile {
-    var displayName: String
-    var hasPassword: Bool
-    var isLoggedIn: Bool
+// MARK: - Perfil de usuario
 
-    static let defaultProfile = UserProfile(displayName: "", hasPassword: false, isLoggedIn: false)
+struct UserProfile {
+    var displayName: String = ""
+    var hasPassword: Bool = false
+    var isLoggedIn: Bool = false
 }
 
-/// Almacén del perfil: guardar/cargar y comprobar contraseña.
-final class UserProfileStore: ObservableObject {
-    @Published var profile: UserProfile
+// MARK: - Store del perfil (ObservableObject)
 
-    private let nameKey = "cineTrack.userName"
-    private let hasPasswordKey = "cineTrack.hasPassword"
-    private let isLoggedInKey = "cineTrack.isLoggedIn"
-    private let passwordKey = "cineTrack.password"
+final class UserProfileStore: ObservableObject {
+    @Published var profile = UserProfile()
+
+    private let nameKey = "userName"
+    private let hasPasswordKey = "hasPassword"
+    private let isLoggedInKey = "isLoggedIn"
+    private let passwordKey = "userPassword"
 
     init() {
-        let name = UserDefaults.standard.string(forKey: nameKey) ?? ""
-        let hasPassword = UserDefaults.standard.bool(forKey: hasPasswordKey)
-        let isLoggedIn = UserDefaults.standard.bool(forKey: isLoggedInKey)
-        profile = UserProfile(displayName: name, hasPassword: hasPassword, isLoggedIn: isLoggedIn)
+        profile.displayName = UserDefaults.standard.string(forKey: nameKey) ?? ""
+        profile.hasPassword = UserDefaults.standard.bool(forKey: hasPasswordKey)
+        profile.isLoggedIn = UserDefaults.standard.bool(forKey: isLoggedInKey)
     }
 
     func createAccount(name: String, password: String) {
-        profile.displayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        profile.displayName = name
         profile.hasPassword = true
         profile.isLoggedIn = true
-        UserDefaults.standard.set(profile.displayName, forKey: nameKey)
+        UserDefaults.standard.set(name, forKey: nameKey)
         UserDefaults.standard.set(true, forKey: hasPasswordKey)
         UserDefaults.standard.set(true, forKey: isLoggedInKey)
         UserDefaults.standard.set(password, forKey: passwordKey)
@@ -48,13 +47,5 @@ final class UserProfileStore: ObservableObject {
     func logout() {
         profile.isLoggedIn = false
         UserDefaults.standard.set(false, forKey: isLoggedInKey)
-    }
-
-    func setPassword(_ password: String) {
-        profile.hasPassword = true
-        profile.isLoggedIn = true
-        UserDefaults.standard.set(true, forKey: hasPasswordKey)
-        UserDefaults.standard.set(true, forKey: isLoggedInKey)
-        UserDefaults.standard.set(password, forKey: passwordKey)
     }
 }

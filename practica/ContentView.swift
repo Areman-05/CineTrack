@@ -1,33 +1,25 @@
 import SwiftUI
 
-/// Vista raíz: TabView con Inicio (Buscador), Explorar y Favoritos.
-/// Compatible con iOS 14.4.
 struct ContentView: View {
     var body: some View {
         TabView {
             BuscadorPeliculasView()
                 .tabItem {
-                    Image(systemName: "magnifyingglass")
-                    Text("Inicio")
+                    Label("Inicio", systemImage: "magnifyingglass")
                 }
             ExplorarView()
                 .tabItem {
-                    Image(systemName: "square.grid.2x2")
-                    Text("Explorar")
+                    Label("Explorar", systemImage: "square.grid.2x2")
                 }
             FavoritosView()
                 .tabItem {
-                    Image(systemName: "heart.fill")
-                    Text("Favoritos")
+                    Label("Favoritos", systemImage: "heart.fill")
                 }
             PerfilView()
                 .tabItem {
-                    Image(systemName: "person.circle.fill")
-                    Text("Perfil")
+                    Label("Perfil", systemImage: "person.circle.fill")
                 }
         }
-        .accentColor(AppTheme.accent)
-        .preferredColorScheme(.dark)
     }
 }
 

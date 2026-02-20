@@ -1,217 +1,92 @@
 import Foundation
-import SwiftUI
 
-/// ViewModel que gestiona el estado y lógica de las películas
-/// Implementa el patrón MVVM siguiendo las directrices de teoría
+// Struct auxiliar para persistir preferencias
+private struct SavedPref: Codable {
+    let id: Int
+    let pref: UserPreference
+}
+
+// MARK: - ViewModel (MVVM)
+
 class MovieViewModel: ObservableObject {
+
     @Published var movies: [Movie] = []
-    @Published var popularMovies: [Movie] = []
-    /// Películas para Explorar (mejor valoradas), distinto del discover de Inicio.
     @Published var exploreMovies: [Movie] = []
     @Published var genres: [Genre] = []
     @Published var isLoading = false
-    @Published var isLoadingPopular = false
     @Published var isLoadingExplore = false
     @Published var errorMessage: String?
-    @Published var popularErrorMessage: String?
     @Published var exploreErrorMessage: String?
     @Published var userPreferences: [Int: UserPreference] = [:]
+    @Published var savedMovies: [Movie] = []
     @Published var favoriteLists: [FavoriteList] = []
-    /// Caché de películas (favoritas y en listas) para persistir y mostrar tras reinicio.
-    @Published var movieCache: [Movie] = []
 
-    private let tmdbService = TMDBService.shared
-    private let favoriteListsKey = "cineTrack.favoriteLists"
-    private let preferencesKey = "cineTrack.userPreferences"
-    private let movieCacheKey = "cineTrack.movieCache"
+    var favoriteMovies: [Movie] {
+        savedMovies.filter { isFavorite(movieId: $0.id) }
+    }
+
+    private let service = TMDBService.shared
+
+    private let prefsKey = "prefs"
+    private let savedMoviesKey = "savedMovies"
+    private let listsKey = "favoriteLists"
 
     init() {
+        loadPreferences()
+        loadSavedMovies()
         loadFavoriteLists()
-        loadUserPreferences()
-        loadMovieCache()
     }
 
-    private struct SavedPreference: Codable {
-        let movieId: Int
-        let preference: UserPreference
-    }
+    // MARK: - Cargar películas
 
-    private func loadUserPreferences() {
-        guard let data = UserDefaults.standard.data(forKey: preferencesKey),
-              let decoded = try? JSONDecoder().decode([SavedPreference].self, from: data) else {
-            userPreferences = [:]
-            return
-        }
-        var prefs: [Int: UserPreference] = [:]
-        for item in decoded {
-            prefs[item.movieId] = item.preference
-        }
-        userPreferences = prefs
-    }
-
-    private func saveUserPreferences() {
-        let arr = userPreferences.map { SavedPreference(movieId: $0.key, preference: $0.value) }
-        guard let data = try? JSONEncoder().encode(arr) else { return }
-        UserDefaults.standard.set(data, forKey: preferencesKey)
-    }
-
-    private func loadFavoriteLists() {
-        guard let data = UserDefaults.standard.data(forKey: favoriteListsKey),
-              let decoded = try? JSONDecoder().decode([FavoriteList].self, from: data) else {
-            favoriteLists = []
-            return
-        }
-        favoriteLists = decoded
-    }
-
-    private func saveFavoriteLists() {
-        guard let data = try? JSONEncoder().encode(favoriteLists) else { return }
-        UserDefaults.standard.set(data, forKey: favoriteListsKey)
-    }
-
-    private func loadMovieCache() {
-        guard let data = UserDefaults.standard.data(forKey: movieCacheKey) else {
-            movieCache = []
-            return
-        }
-        do {
-            movieCache = try JSONDecoder().decode([Movie].self, from: data)
-        } catch {
-            movieCache = []
-        }
-    }
-
-    private func saveMovieCache() {
-        guard let data = try? JSONEncoder().encode(movieCache) else { return }
-        UserDefaults.standard.set(data, forKey: movieCacheKey)
-    }
-
-    private func addToCacheIfNeeded(_ movie: Movie) {
-        if !movieCache.contains(where: { $0.id == movie.id }) {
-            movieCache.append(movie)
-            saveMovieCache()
-        }
-    }
-
-    private func removeFromCache(movieId: Int) {
-        movieCache.removeAll { $0.id == movieId }
-        saveMovieCache()
-    }
-
-    func addFavoriteList(name: String) {
-        let list = FavoriteList(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
-        guard !list.name.isEmpty else { return }
-        favoriteLists.append(list)
-        saveFavoriteLists()
-    }
-
-    func removeFavoriteList(id: UUID) {
-        favoriteLists.removeAll { $0.id == id }
-        saveFavoriteLists()
-    }
-
-    func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
-        let newValue: [FavoriteList] = favoriteLists.map { list in
-            guard list.id == listId else { return list }
-            if list.movieIds.contains(movieId) { return list }
-            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds + [movieId])
-        }
-        favoriteLists = newValue
-        saveFavoriteLists()
-        if let m = movie { addToCacheIfNeeded(m) }
-    }
-
-    func removeMovieFromList(movieId: Int, listId: UUID) {
-        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
-        let newValue: [FavoriteList] = favoriteLists.map { list in
-            guard list.id == listId else { return list }
-            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds.filter { $0 != movieId })
-        }
-        favoriteLists = newValue
-        saveFavoriteLists()
-    }
-
-    func movies(in listId: UUID) -> [Movie] {
-        guard let list = favoriteLists.first(where: { $0.id == listId }) else { return [] }
-        return list.movieIds.compactMap { id in
-            movieCache.first { $0.id == id } ?? allLoadedMovies.first { $0.id == id }
-        }
-    }
-    
-    /// Carga la lista de géneros (para filtros de búsqueda)A
-    func loadGenres() {
-        tmdbService.fetchMovieGenres { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let list):
-                    self?.genres = list
-                case .failure:
-                    self?.genres = []
-                }
-            }
-        }
-    }
-    
-    /// Carga las películas populares (reservado si se usa en otro sitio).
-    func loadPopularMovies() {
-        isLoadingPopular = true
-        popularErrorMessage = nil
-        tmdbService.fetchPopularMovies { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoadingPopular = false
-                switch result {
-                case .success(let movies):
-                    self?.popularMovies = movies
-                case .failure(let error):
-                    self?.popularErrorMessage = "Error al cargar: \(error.localizedDescription)"
-                }
-            }
-        }
-    }
-
-    /// Carga películas para la pestaña Explorar (usa populares; distinto del discover de Inicio).
     func loadExploreMovies() {
         isLoadingExplore = true
         exploreErrorMessage = nil
-        tmdbService.fetchPopularMovies { [weak self] result in
+        service.fetchPopularMovies { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoadingExplore = false
                 switch result {
                 case .success(let movies):
                     self?.exploreMovies = movies
                 case .failure(let error):
-                    self?.exploreErrorMessage = "Error al cargar: \(error.localizedDescription)"
+                    self?.exploreErrorMessage = "Error: \(error.localizedDescription)"
                 }
             }
         }
     }
-    
-    /// Busca películas por título (sin filtros adicionales)
-    func searchMovies(query: String) {
-        searchWithFilters(query: query, minRating: nil, genreIds: nil)
+
+    func loadGenres() {
+        service.fetchMovieGenres { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let genres):
+                    self?.genres = genres
+                case .failure:
+                    break
+                }
+            }
+        }
     }
-    
-    /// Búsqueda con criterios: título, puntuación mínima y/o género(s).
-    /// Si no hay texto, usa discover con filtros. Si hay texto, busca por título y filtra por puntuación.
-    func searchWithFilters(query: String, minRating: Double?, genreIds: [Int]?) {
+
+    func searchMovies(query: String, minRating: Double? = nil, genreIds: [Int]? = nil) {
         isLoading = true
         errorMessage = nil
-        
-        if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tmdbService.discoverMovies(minRating: minRating, genreIds: genreIds) { [weak self] result in
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmed.isEmpty {
+            service.discoverMovies(minRating: minRating, genreIds: genreIds) { [weak self] result in
                 DispatchQueue.main.async {
                     self?.isLoading = false
                     switch result {
                     case .success(let movies):
                         self?.movies = movies
                     case .failure(let error):
-                        self?.errorMessage = "Error al cargar: \(error.localizedDescription)"
+                        self?.errorMessage = "Error: \(error.localizedDescription)"
                     }
                 }
             }
         } else {
-            tmdbService.searchMovies(query: query) { [weak self] result in
+            service.searchMovies(query: trimmed) { [weak self] result in
                 DispatchQueue.main.async {
                     self?.isLoading = false
                     switch result {
@@ -221,89 +96,182 @@ class MovieViewModel: ObservableObject {
                         }
                         self?.movies = movies
                     case .failure(let error):
-                        self?.errorMessage = "Error en la búsqueda: \(error.localizedDescription)"
+                        self?.errorMessage = "Error: \(error.localizedDescription)"
                     }
                 }
             }
         }
     }
-    
-    /// Marca o desmarca una película como favorita. Pasar movie al marcar para guardarla en caché.
-    func toggleFavorite(movieId: Int, movie: Movie? = nil) {
-        // Es mejor envolver esto también en el hilo principal para evitar colisiones con la UI
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            if var pref = self.userPreferences[movieId] {
-                let wasFavorite = pref.isFavorite
-                pref.isFavorite.toggle()
-                self.userPreferences[movieId] = pref // Reasignación obligatoria
-                
-                if wasFavorite {
-                    let stillInList = self.favoriteLists.contains { $0.movieIds.contains(movieId) }
-                    if !stillInList { self.removeFromCache(movieId: movieId) }
-                }
-            } else {
-                self.userPreferences[movieId] = UserPreference(isFavorite: true)
-                if let m = movie { self.addToCacheIfNeeded(m) }
-            }
-            self.saveUserPreferences()
-        }
+
+    // MARK: - Favoritos
+
+    func isFavorite(movieId: Int) -> Bool {
+        return userPreferences[movieId]?.isFavorite ?? false
     }
 
-    /// Actualiza el estado de visualización (previsto ver, viendo, visto)
+    func toggleFavorite(movie: Movie) {
+        if isFavorite(movieId: movie.id) {
+            userPreferences[movie.id]?.isFavorite = false
+            let enAlgunaLista = favoriteLists.contains { $0.movieIds.contains(movie.id) }
+            if !enAlgunaLista {
+                savedMovies.removeAll { $0.id == movie.id }
+            }
+        } else {
+            if userPreferences[movie.id] == nil {
+                userPreferences[movie.id] = UserPreference(isFavorite: true)
+            } else {
+                userPreferences[movie.id]?.isFavorite = true
+            }
+            if !savedMovies.contains(where: { $0.id == movie.id }) {
+                savedMovies.append(movie)
+            }
+        }
+        savePreferences()
+        saveSavedMovies()
+    }
+
+    func removeFromFavorites(movieId: Int) {
+        userPreferences[movieId]?.isFavorite = false
+        let enAlgunaLista = favoriteLists.contains { $0.movieIds.contains(movieId) }
+        if !enAlgunaLista {
+            savedMovies.removeAll { $0.id == movieId }
+        }
+        savePreferences()
+        saveSavedMovies()
+    }
+
+    // MARK: - Estado de visualización
+
+    func watchStatus(for movieId: Int) -> WatchStatus {
+        return userPreferences[movieId]?.watchStatus ?? .toWatch
+    }
+
     func setWatchStatus(movieId: Int, status: WatchStatus) {
         if userPreferences[movieId] == nil {
             userPreferences[movieId] = UserPreference(watchStatus: status)
         } else {
             userPreferences[movieId]?.watchStatus = status
         }
-        saveUserPreferences()
+        savePreferences()
     }
 
-    /// Actualiza la nota personal de una película/serie
+    // MARK: - Nota personal
+
+    func personalNote(for movieId: Int) -> String {
+        return userPreferences[movieId]?.personalNote ?? ""
+    }
+
     func updatePersonalNote(movieId: Int, note: String) {
         if userPreferences[movieId] == nil {
             userPreferences[movieId] = UserPreference(personalNote: note)
         } else {
             userPreferences[movieId]?.personalNote = note
         }
-        saveUserPreferences()
+        savePreferences()
     }
 
-    /// Elimina una película/serie de la lista del usuario (quitar de favoritos y preferencias)
-    func removeFromList(movieId: Int) {
-        userPreferences.removeValue(forKey: movieId)
-        // Quitar del caché solo si ya no está en ninguna lista
-        let stillInList = favoriteLists.contains { $0.movieIds.contains(movieId) }
-        if !stillInList { removeFromCache(movieId: movieId) }
-        saveUserPreferences()
+    // MARK: - Listas personalizadas
+
+    func isInList(movieId: Int, listId: UUID) -> Bool {
+        return favoriteLists.first(where: { $0.id == listId })?.movieIds.contains(movieId) ?? false
     }
-    
-    func isFavorite(movieId: Int) -> Bool {
-        return userPreferences[movieId]?.isFavorite ?? false
+
+    func addFavoriteList(name: String) {
+        let list = FavoriteList(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
+        favoriteLists.append(list)
+        saveFavoriteLists()
     }
-    
-    func watchStatus(for movieId: Int) -> WatchStatus {
-        return userPreferences[movieId]?.watchStatus ?? .toWatch
+
+    func removeFavoriteList(id: UUID) {
+        favoriteLists.removeAll { $0.id == id }
+        saveFavoriteLists()
+        savedMovies = savedMovies.filter { movie in
+            isFavorite(movieId: movie.id) || favoriteLists.contains { $0.movieIds.contains(movie.id) }
+        }
+        saveSavedMovies()
     }
-    
-    func personalNote(for movieId: Int) -> String {
-        return userPreferences[movieId]?.personalNote ?? ""
+
+    func addMovieToList(movieId: Int, listId: UUID, movie: Movie) {
+        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
+        let newLists = favoriteLists.map { list in
+            guard list.id == listId else { return list }
+            if list.movieIds.contains(movieId) { return list }
+            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds + [movieId])
+        }
+        favoriteLists = newLists
+        saveFavoriteLists()
+        if !savedMovies.contains(where: { $0.id == movie.id }) {
+            savedMovies.append(movie)
+            saveSavedMovies()
+        }
     }
-    
-    /// Todas las películas cargadas (buscador + populares + explorar) sin duplicados por id.
-    var allLoadedMovies: [Movie] {
+
+    func removeMovieFromList(movieId: Int, listId: UUID) {
+        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
+        let newLists = favoriteLists.map { list in
+            guard list.id == listId else { return list }
+            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds.filter { $0 != movieId })
+        }
+        favoriteLists = newLists
+        saveFavoriteLists()
+        let sigueEnOtraLista = favoriteLists.contains { $0.movieIds.contains(movieId) }
+        if !sigueEnOtraLista && !isFavorite(movieId: movieId) {
+            savedMovies.removeAll { $0.id == movieId }
+            saveSavedMovies()
+        }
+    }
+
+    func moviesInList(_ listId: UUID) -> [Movie] {
+        guard let list = favoriteLists.first(where: { $0.id == listId }) else { return [] }
+        let todasDisponibles = savedMovies + movies + exploreMovies
+        return list.movieIds.compactMap { id in
+            todasDisponibles.first { $0.id == id }
+        }
+    }
+
+    var todasLasPeliculas: [Movie] {
         var seen = Set<Int>()
-        return (movies + popularMovies + exploreMovies).filter { seen.insert($0.id).inserted }
+        return (savedMovies + movies + exploreMovies).filter { seen.insert($0.id).inserted }
     }
 
-    /// Lista de favoritos (caché persistido + cargadas en sesión, sin duplicados).
-    var favoriteMovies: [Movie] {
-        let fromCache = movieCache.filter { isFavorite(movieId: $0.id) }
-        let cacheIds = Set(fromCache.map(\.id))
-        let fromLoaded = allLoadedMovies.filter { isFavorite(movieId: $0.id) && !cacheIds.contains($0.id) }
-        return fromCache + fromLoaded
+    // MARK: - Persistencia
+
+    private func savePreferences() {
+        let arr = userPreferences.map { SavedPref(id: $0.key, pref: $0.value) }
+        if let data = try? JSONEncoder().encode(arr) {
+            UserDefaults.standard.set(data, forKey: prefsKey)
+        }
     }
 
+    private func loadPreferences() {
+        guard let data = UserDefaults.standard.data(forKey: prefsKey),
+              let decoded = try? JSONDecoder().decode([SavedPref].self, from: data) else { return }
+        for item in decoded {
+            userPreferences[item.id] = item.pref
+        }
+    }
+
+    private func saveSavedMovies() {
+        if let data = try? JSONEncoder().encode(savedMovies) {
+            UserDefaults.standard.set(data, forKey: savedMoviesKey)
+        }
+    }
+
+    private func loadSavedMovies() {
+        guard let data = UserDefaults.standard.data(forKey: savedMoviesKey),
+              let decoded = try? JSONDecoder().decode([Movie].self, from: data) else { return }
+        savedMovies = decoded
+    }
+
+    private func saveFavoriteLists() {
+        if let data = try? JSONEncoder().encode(favoriteLists) {
+            UserDefaults.standard.set(data, forKey: listsKey)
+        }
+    }
+
+    private func loadFavoriteLists() {
+        guard let data = UserDefaults.standard.data(forKey: listsKey),
+              let decoded = try? JSONDecoder().decode([FavoriteList].self, from: data) else { return }
+        favoriteLists = decoded
+    }
 }

@@ -1,30 +1,25 @@
 import Foundation
 
-/// Estado de visualización: previsto ver, viendo, visto.
+// MARK: - Estado de visualización
+
 enum WatchStatus: String, Codable, CaseIterable {
-    case toWatch = "previsto_ver"
-    case watching = "viendo"
-    case watched = "visto"
-    
+    case toWatch = "toWatch"
+    case watching = "watching"
+    case watched = "watched"
+
     var displayName: String {
         switch self {
-        case .toWatch: return "Previsto ver"
+        case .toWatch: return "Por ver"
         case .watching: return "Viendo"
         case .watched: return "Visto"
         }
     }
 }
 
-/// Preferencias del usuario por película/serie: favorito, nota y estado de visualización.
+// MARK: - Preferencias por película
+
 struct UserPreference: Codable {
-    var isFavorite: Bool
-    var personalNote: String
-    /// Estado: previsto ver, viendo o visto.
-    var watchStatus: WatchStatus
-    
-    init(isFavorite: Bool = false, personalNote: String = "", watchStatus: WatchStatus = .toWatch) {
-        self.isFavorite = isFavorite
-        self.personalNote = personalNote
-        self.watchStatus = watchStatus
-    }
+    var isFavorite: Bool = false
+    var personalNote: String = ""
+    var watchStatus: WatchStatus = .toWatch
 }

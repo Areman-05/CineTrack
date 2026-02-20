@@ -3,64 +3,68 @@ import SwiftUI
 /// Pantalla de Favoritos: todas las favoritas y listas/grupos del usuario.
 /// Compatible con iOS 14.4.
 struct FavoritosView: View {
-    @EnvironmentObject private var viewModel: MovieViewModel
+    @EnvironmentObject var viewModel: MovieViewModel
     @State private var showNewListSheet = false
     @State private var newListName = ""
 
     var body: some View {
         NavigationView {
-            ZStack {
-                AppTheme.background.ignoresSafeArea()
-
+            Group {
                 if viewModel.favoriteMovies.isEmpty && viewModel.favoriteLists.isEmpty {
-                    emptyState
+                    VStack(spacing: 16) {
+                        Image(systemName: "heart.slash")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary)
+                        Text("No tienes favoritos")
+                            .font(.title3)
+                        Text("Añade películas desde Buscador o Explorar.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
                         if !viewModel.favoriteMovies.isEmpty {
-                            Section(header: sectionHeader("Todas")) {
+                            Section(header: Text("Todas")) {
                                 ForEach(viewModel.favoriteMovies) { movie in
                                     NavigationLink(destination: DetailView(movie: movie)) {
-                                        MovieCardView(movie: movie, viewModel: viewModel, showFavorite: false, showWatchStatus: true, large: true)
+                                        MovieCardView(movie: movie)
                                     }
-                                    .listRowBackground(AppTheme.background)
-                                    .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
-                                    .contextMenu {
-                                        if !viewModel.favoriteLists.isEmpty {
-                                            ForEach(viewModel.favoriteLists) { list in
-                                                Button(action: { viewModel.addMovieToList(movieId: movie.id, listId: list.id) }) {
-                                                    Label(list.name, systemImage: "folder")
-                                                }
-                                            }
-                                        }
+                                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                                }
+                                .onDelete { offsets in
+                                    for index in offsets {
+                                        let movie = viewModel.favoriteMovies[index]
+                                        viewModel.removeFromFavorites(movieId: movie.id)
                                     }
                                 }
-                                .onDelete(perform: eliminarFavorito)
                             }
                         }
 
                         if !viewModel.favoriteLists.isEmpty {
-                            Section(header: sectionHeader("Mis listas")) {
+                            Section(header: Text("Mis listas")) {
                                 ForEach(viewModel.favoriteLists) { list in
                                     NavigationLink(destination: ListaDetailView(list: list)) {
-                                        HStack(spacing: 12) {
+                                        HStack {
                                             Image(systemName: "folder.fill")
-                                                .font(.title2)
-                                                .foregroundColor(AppTheme.accent)
-                                            VStack(alignment: .leading, spacing: 2) {
+                                                .foregroundColor(.blue)
+                                            VStack(alignment: .leading) {
                                                 Text(list.name)
-                                                    .font(AppTheme.headline)
-                                                    .foregroundColor(AppTheme.textPrimary)
+                                                    .font(.headline)
                                                 Text("\(list.movieIds.count) películas")
-                                                    .font(AppTheme.caption)
-                                                    .foregroundColor(AppTheme.textSecondary)
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
                                             }
-                                            Spacer()
                                         }
-                                        .padding(.vertical, 8)
+                                        .padding(.vertical, 4)
                                     }
-                                    .listRowBackground(AppTheme.surface)
                                 }
-                                .onDelete(perform: eliminarLista)
+                                .onDelete { offsets in
+                                    for index in offsets {
+                                        viewModel.removeFavoriteList(id: viewModel.favoriteLists[index].id)
+                                    }
+                                }
                             }
                         }
                     }
@@ -68,118 +72,55 @@ struct FavoritosView: View {
                 }
             }
             .navigationTitle("Favoritos")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar(content: {
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showNewListSheet = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(AppTheme.accent)
+                        Image(systemName: "plus")
                     }
                 }
-            })
+            }
             .sheet(isPresented: $showNewListSheet) {
-                NewListSheet(
-                    name: $newListName,
-                    onCreate: {
-                        let name = newListName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if !name.isEmpty {
-                            viewModel.addFavoriteList(name: name)
-                            newListName = ""
-                            showNewListSheet = false
+                NavigationView {
+                    VStack(spacing: 20) {
+                        TextField("Nombre de la lista", text: $newListName)
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                        Spacer()
+                    }
+                    .padding(.top, 20)
+                    .navigationTitle("Nueva lista")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Cancelar") {
+                                newListName = ""
+                                showNewListSheet = false
+                            }
                         }
-                    },
-                    onCancel: { showNewListSheet = false; newListName = "" }
-                )
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Crear") {
+                                if !newListName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    viewModel.addFavoriteList(name: newListName)
+                                    newListName = ""
+                                    showNewListSheet = false
+                                }
+                            }
+                            .disabled(newListName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                    }
+                }
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "heart.slash")
-                .font(.system(size: 56))
-                .foregroundColor(AppTheme.textTertiary)
-            Text("No tienes favoritos")
-                .font(AppTheme.titleMedium)
-                .foregroundColor(AppTheme.textPrimary)
-            Text("Marca como favorito en Inicio o Explorar, o crea una lista con el botón +.")
-                .font(AppTheme.subheadline)
-                .foregroundColor(AppTheme.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(AppTheme.caption)
-            .fontWeight(.semibold)
-            .foregroundColor(AppTheme.textTertiary)
-    }
-
-    private func eliminarFavorito(at offsets: IndexSet) {
-        let favoritos = viewModel.favoriteMovies
-        for index in offsets where index < favoritos.count {
-            viewModel.removeFromList(movieId: favoritos[index].id)
-        }
-    }
-
-    private func eliminarLista(at offsets: IndexSet) {
-        for index in offsets where index < viewModel.favoriteLists.count {
-            viewModel.removeFavoriteList(id: viewModel.favoriteLists[index].id)
-        }
-    }
 }
 
-/// Sheet para crear una nueva lista de favoritos.
-struct NewListSheet: View {
-    @Binding var name: String
-    var onCreate: () -> Void
-    var onCancel: () -> Void
-
-    var body: some View {
-        NavigationView {
-            ZStack {
-                AppTheme.background.ignoresSafeArea()
-                VStack(spacing: 20) {
-                    TextField("Nombre de la lista", text: $name)
-                        .font(AppTheme.body)
-                        .foregroundColor(AppTheme.textPrimary)
-                        .padding()
-                        .background(AppTheme.surface)
-                        .cornerRadius(AppTheme.cardCornerRadius)
-                        .padding(.horizontal, 20)
-                    Spacer()
-                }
-                .padding(.top, 24)
-            }
-            .navigationTitle("Nueva lista")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancelar") { onCancel() }
-                        .foregroundColor(AppTheme.textSecondary)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { onCreate() }) {
-                        Text("Crear")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(AppTheme.accent)
-                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            })
-        }
-    }
-}
-
-#if DEBUG
 struct FavoritosView_Previews: PreviewProvider {
     static var previews: some View {
         FavoritosView()
             .environmentObject(MovieViewModel())
     }
 }
-#endif
