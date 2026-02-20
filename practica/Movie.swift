@@ -48,14 +48,24 @@ struct Movie: Identifiable, Codable {
         case mediaType = "media_type"
     }
     
+    init(id: Int, title: String, overview: String, posterPath: String?, voteAverage: Double, releaseDate: String, mediaType: MediaType? = .movie) {
+        self.id = id
+        self.title = title
+        self.overview = overview
+        self.posterPath = posterPath
+        self.voteAverage = voteAverage
+        self.releaseDate = releaseDate
+        self.mediaType = mediaType
+    }
+
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(Int.self, forKey: .id)
         title = try c.decode(String.self, forKey: .title)
-        overview = try c.decode(String.self, forKey: .overview)
+        overview = try c.decodeIfPresent(String.self, forKey: .overview) ?? ""
         posterPath = try c.decodeIfPresent(String.self, forKey: .posterPath)
         voteAverage = try c.decode(Double.self, forKey: .voteAverage)
-        releaseDate = try c.decode(String.self, forKey: .releaseDate)
+        releaseDate = try c.decodeIfPresent(String.self, forKey: .releaseDate) ?? ""
         mediaType = try c.decodeIfPresent(MediaType.self, forKey: .mediaType) ?? .movie
     }
 }

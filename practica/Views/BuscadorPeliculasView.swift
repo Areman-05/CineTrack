@@ -82,12 +82,25 @@ struct BuscadorPeliculasView: View {
                     Spacer()
                 } else {
                     List(viewModel.movies) { movie in
-                        NavigationLink(destination: Text(movie.title)) {
+                        NavigationLink(destination: DetailView(movie: movie)) {
                             HStack {
-                                Text(movie.title)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(movie.title)
+                                    Text(movie.mediaType?.displayName ?? "Pelicula")
+                                        .font(.caption)
+                                        .foregroundColor(.blue)
+                                }
                                 Spacer()
+                                Button(action: {
+                                    viewModel.toggleFavorite(movieId: movie.id)
+                                }) {
+                                    Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
+                                        .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? .red : .gray)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                                 Text(String(format: "%.1f", movie.voteAverage))
                                     .foregroundColor(.gray)
+                                    .frame(width: 36, alignment: .trailing)
                             }
                         }
                     }
