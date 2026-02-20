@@ -150,7 +150,7 @@ struct CreatePasswordSheet: View {
                     Button("Cancelar") { presentationMode.wrappedValue.dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Guardar") {
+                    Button(action: {
                         if password != confirm {
                             errorMessage = "Las contraseñas no coinciden"
                         } else if password.count < 4 {
@@ -159,8 +159,9 @@ struct CreatePasswordSheet: View {
                             profileStore.createAccount(name: name, password: password)
                             presentationMode.wrappedValue.dismiss()
                         }
+                    }) {
+                        Text("Guardar").fontWeight(.semibold)
                     }
-                    .fontWeight(.semibold)
                 }
             }
         }
@@ -200,14 +201,15 @@ struct LoginSheet: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Entrar") {
+                    Button(action: {
                         if profileStore.login(password: password) {
                             presentationMode.wrappedValue.dismiss()
                         } else {
                             showError = true
                         }
+                    }) {
+                        Text("Entrar").fontWeight(.semibold)
                     }
-                    .fontWeight(.semibold)
                 }
             }
         }

@@ -193,7 +193,7 @@ class MovieViewModel: ObservableObject {
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie) {
         guard favoriteLists.contains(where: { $0.id == listId }) else { return }
-        let newLists = favoriteLists.map { list in
+        let newLists: [FavoriteList] = favoriteLists.map { list in
             guard list.id == listId else { return list }
             if list.movieIds.contains(movieId) { return list }
             return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds + [movieId])
@@ -208,7 +208,7 @@ class MovieViewModel: ObservableObject {
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
         guard favoriteLists.contains(where: { $0.id == listId }) else { return }
-        let newLists = favoriteLists.map { list in
+        let newLists: [FavoriteList] = favoriteLists.map { list in
             guard list.id == listId else { return list }
             return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds.filter { $0 != movieId })
         }
