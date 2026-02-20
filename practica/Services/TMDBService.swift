@@ -1,16 +1,19 @@
 import Foundation
 
-/// Errores específicos del servicio TMDB
-enum TMDBError: Error {
+/// Errores específicos del servicio TMDB (conforme a LocalizedError, teoría S06).
+enum TMDBError: LocalizedError {
     case invalidURL
+    case invalidResponse
     case noData
     case decodingError
     case networkError(Error)
-    
-    var localizedDescription: String {
+
+    var errorDescription: String? {
         switch self {
         case .invalidURL:
             return "URL inválida"
+        case .invalidResponse:
+            return "Respuesta inválida del servidor"
         case .noData:
             return "No se recibieron datos del servidor"
         case .decodingError:
@@ -56,6 +59,10 @@ class TMDBService {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(TMDBError.networkError(error)))
+                return
+            }
+            if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+                completion(.failure(TMDBError.invalidResponse))
                 return
             }
             guard let data = data else {
@@ -117,12 +124,14 @@ class TMDBService {
                 completion(.failure(TMDBError.networkError(error)))
                 return
             }
-            
+            if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+                completion(.failure(TMDBError.invalidResponse))
+                return
+            }
             guard let data = data else {
                 completion(.failure(TMDBError.noData))
                 return
             }
-            
             do {
                 let movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
                 completion(.success(movieDetail))
@@ -131,20 +140,22 @@ class TMDBService {
             }
         }.resume()
     }
-    
-    /// Método privado para realizar peticiones HTTP genéricas
+
+    /// Método privado para realizar peticiones HTTP genéricas (data, response, error según S06).
     private func performRequest(url: URL, completion: @escaping (Result<[Movie], Error>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(TMDBError.networkError(error)))
                 return
             }
-            
+            if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+                completion(.failure(TMDBError.invalidResponse))
+                return
+            }
             guard let data = data else {
                 completion(.failure(TMDBError.noData))
                 return
             }
-            
             do {
                 let movieResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
                 completion(.success(movieResponse.results))
