@@ -111,28 +111,37 @@ class MovieViewModel: ObservableObject {
     }
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-        var list = favoriteLists[i]
+        let lists = favoriteLists
+        guard let i = lists.firstIndex(where: { $0.id == listId }), i < lists.count else { return }
+        var list = lists[i]
         if !list.movieIds.contains(movieId) {
             list.movieIds.append(movieId)
-            favoriteLists[i] = list
+            var updated = lists
+            updated[i] = list
+            favoriteLists = updated
             saveFavoriteLists()
             if let m = movie { addToCacheIfNeeded(m) }
         }
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
-        guard let i = favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
-        var list = favoriteLists[i]
+        let lists = favoriteLists
+        guard let i = lists.firstIndex(where: { $0.id == listId }), i < lists.count else { return }
+        var list = lists[i]
         list.movieIds.removeAll { $0 == movieId }
-        favoriteLists[i] = list
+        var updated = lists
+        updated[i] = list
+        favoriteLists = updated
         saveFavoriteLists()
     }
 
     func movies(in listId: UUID) -> [Movie] {
-        guard let list = favoriteLists.first(where: { $0.id == listId }) else { return [] }
+        let lists = favoriteLists
+        guard let list = lists.first(where: { $0.id == listId }) else { return [] }
+        let cache = movieCache
+        let loaded = allLoadedMovies
         return list.movieIds.compactMap { id in
-            movieCache.first { $0.id == id } ?? allLoadedMovies.first { $0.id == id }
+            cache.first { $0.id == id } ?? loaded.first { $0.id == id }
         }
     }
     
