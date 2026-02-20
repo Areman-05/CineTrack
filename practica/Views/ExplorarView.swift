@@ -7,6 +7,7 @@ struct ExplorarView: View {
     @State private var isRefreshing = false
 
     var body: some View {
+        // Mantenemos el NavigationView solo si esta vista NO está dentro de otro NavigationView previo
         NavigationView {
             ZStack {
                 AppTheme.background.ignoresSafeArea()
@@ -21,54 +22,21 @@ struct ExplorarView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, 8)
 
-                        if viewModel.isLoadingExplore {
-                            VStack(spacing: 12) {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.accent))
-                                    .scaleEffect(1.2)
-                                Text("Cargando...")
-                                    .font(AppTheme.subheadline)
-                                    .foregroundColor(AppTheme.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 48)
+                        if viewModel.isLoadingExplore && !isRefreshing {
+                            loadingView
                         } else if let error = viewModel.exploreErrorMessage {
-                            VStack(spacing: 16) {
-                                Image(systemName: "wifi.exclamationmark")
-                                    .font(.system(size: 44))
-                                    .foregroundColor(AppTheme.error)
-                                Text(error)
-                                    .font(AppTheme.body)
-                                    .foregroundColor(AppTheme.textSecondary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 32)
-                                Button(action: { viewModel.loadExploreMovies() }) {
-                                    Text("Reintentar")
-                                        .font(AppTheme.headline)
-                                        .foregroundColor(AppTheme.accent)
-                                }
-                                .padding(.top, 8)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 48)
-                        } else if viewModel.exploreMovies.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "star.circle")
-                                    .font(.system(size: 44))
-                                    .foregroundColor(AppTheme.textTertiary)
-                                Text("Pulsa Actualizar para cargar películas")
-                                    .font(AppTheme.subheadline)
-                                    .foregroundColor(AppTheme.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 48)
+                            errorView(error)
                         } else {
-                            ForEach(viewModel.exploreMovies) { movie in
-                                NavigationLink(destination: DetailView(movie: movie)) {
-                                    MovieCardView(movie: movie, viewModel: viewModel, showFavorite: true, showWatchStatus: false, large: true)
+                            // Cambiamos el ForEach para que sea más estable
+                            LazyVStack(spacing: 16) {
+                                ForEach(viewModel.exploreMovies) { movie in
+                                    // Usamos un ID explícito para asegurar que SwiftUI no se pierda
+                                    NavigationLink(destination: DetailView(movie: movie)) {
+                                        MovieCardView(movie: movie, viewModel: viewModel, showFavorite: true, showWatchStatus: false, large: true)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    .padding(.horizontal, 16)
                                 }
-                                .buttonStyle(PlainButtonStyle())
-                                .padding(.horizontal, 16)
                             }
                         }
                     }
@@ -77,28 +45,56 @@ struct ExplorarView: View {
             }
             .navigationTitle("Explorar")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar(content: {
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        isRefreshing = true
                         viewModel.loadExploreMovies()
                     }) {
                         Image(systemName: "arrow.clockwise")
                             .foregroundColor(AppTheme.accent)
                     }
-                    .disabled(viewModel.isLoadingExplore)
                 }
-            })
+            }
             .onAppear {
-                if viewModel.exploreMovies.isEmpty && !viewModel.isLoadingExplore {
+                if viewModel.exploreMovies.isEmpty {
                     viewModel.loadExploreMovies()
                 }
             }
-            .onChange(of: viewModel.isLoadingExplore, perform: { loading in
-                if !loading { isRefreshing = false }
-            })
+            // Eliminamos el onChange que causaba el bucle infinito
         }
         .navigationViewStyle(StackNavigationViewStyle())
+    }
+
+    // Componentes extraídos para limpiar el body
+    private var loadingView: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.accent))
+                .scaleEffect(1.2)
+            Text("Cargando...")
+                .font(AppTheme.subheadline)
+                .foregroundColor(AppTheme.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+    }
+
+    private func errorView(_ error: String) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: "wifi.exclamationmark")
+                .font(.system(size: 44))
+                .foregroundColor(AppTheme.error)
+            Text(error)
+                .font(AppTheme.body)
+                .foregroundColor(AppTheme.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            Button("Reintentar") { viewModel.loadExploreMovies() }
+                .font(AppTheme.headline)
+                .foregroundColor(AppTheme.accent)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
     }
 }
 

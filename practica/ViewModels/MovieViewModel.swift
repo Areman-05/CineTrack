@@ -111,31 +111,34 @@ class MovieViewModel: ObservableObject {
     }
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
-        let newValue: [FavoriteList] = favoriteLists.map { list in
-            guard list.id == listId else { return list }
-            if list.movieIds.contains(movieId) { return list }
-            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds + [movieId])
-        }
-        let movieToCache = movie
+        // 1. Movemos toda la lógica al hilo principal inmediatamente
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.favoriteLists = newValue
+            
+            // 2. Buscamos el índice de la lista dentro del hilo principal
+            guard let index = self.favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
+            
+            // 3. Evitamos duplicados
+            if self.favoriteLists[index].movieIds.contains(movieId) { return }
+            
+            // 4. Modificamos directamente sobre la propiedad publicada
+            self.favoriteLists[index].movieIds.append(movieId)
+            
+            // 5. Guardamos y actualizamos caché
             self.saveFavoriteLists()
-            if let m = movieToCache { self.addToCacheIfNeeded(m) }
+            if let m = movie {
+                self.addToCacheIfNeeded(m)
+            }
         }
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
-        guard favoriteLists.contains(where: { $0.id == listId }) else { return }
-        let newValue: [FavoriteList] = favoriteLists.map { list in
-            guard list.id == listId else { return list }
-            return FavoriteList(id: list.id, name: list.name, movieIds: list.movieIds.filter { $0 != movieId })
-        }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.favoriteLists = newValue
-            self.saveFavoriteLists()
+            if let index = self.favoriteLists.firstIndex(where: { $0.id == listId }) {
+                self.favoriteLists[index].movieIds.removeAll { $0 == movieId }
+                self.saveFavoriteLists()
+            }
         }
     }
 
@@ -146,7 +149,7 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    /// Carga la lista de géneros (para filtros de búsqueda)
+    /// Carga la lista de géneros (para filtros de búsqueda)A
     func loadGenres() {
         tmdbService.fetchMovieGenres { [weak self] result in
             DispatchQueue.main.async {
@@ -237,18 +240,25 @@ class MovieViewModel: ObservableObject {
     
     /// Marca o desmarca una película como favorita. Pasar movie al marcar para guardarla en caché.
     func toggleFavorite(movieId: Int, movie: Movie? = nil) {
-        if userPreferences[movieId] == nil {
-            userPreferences[movieId] = UserPreference(isFavorite: true)
-            if movie != nil { addToCacheIfNeeded(movie!) }
-        } else {
-            let wasFavorite = userPreferences[movieId]?.isFavorite ?? false
-            userPreferences[movieId]?.isFavorite.toggle()
-            if wasFavorite {
-                let stillInList = favoriteLists.contains { $0.movieIds.contains(movieId) }
-                if !stillInList { removeFromCache(movieId: movieId) }
+        // Es mejor envolver esto también en el hilo principal para evitar colisiones con la UI
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            if var pref = self.userPreferences[movieId] {
+                let wasFavorite = pref.isFavorite
+                pref.isFavorite.toggle()
+                self.userPreferences[movieId] = pref // Reasignación obligatoria
+                
+                if wasFavorite {
+                    let stillInList = self.favoriteLists.contains { $0.movieIds.contains(movieId) }
+                    if !stillInList { self.removeFromCache(movieId: movieId) }
+                }
+            } else {
+                self.userPreferences[movieId] = UserPreference(isFavorite: true)
+                if let m = movie { self.addToCacheIfNeeded(m) }
             }
+            self.saveUserPreferences()
         }
-        saveUserPreferences()
     }
 
     /// Actualiza el estado de visualización (previsto ver, viendo, visto)
