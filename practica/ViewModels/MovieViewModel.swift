@@ -111,37 +111,34 @@ class MovieViewModel: ObservableObject {
     }
 
     func addMovieToList(movieId: Int, listId: UUID, movie: Movie? = nil) {
-        let lists = favoriteLists
-        guard let i = lists.firstIndex(where: { $0.id == listId }), i < lists.count else { return }
-        var list = lists[i]
-        if !list.movieIds.contains(movieId) {
-            list.movieIds.append(movieId)
-            var updated = lists
-            updated[i] = list
-            favoriteLists = updated
-            saveFavoriteLists()
-            if let m = movie { addToCacheIfNeeded(m) }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard let i = self.favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
+            var list = self.favoriteLists[i]
+            if !list.movieIds.contains(movieId) {
+                list.movieIds.append(movieId)
+                self.favoriteLists[i] = list
+                self.saveFavoriteLists()
+                if let m = movie { self.addToCacheIfNeeded(m) }
+            }
         }
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
-        let lists = favoriteLists
-        guard let i = lists.firstIndex(where: { $0.id == listId }), i < lists.count else { return }
-        var list = lists[i]
-        list.movieIds.removeAll { $0 == movieId }
-        var updated = lists
-        updated[i] = list
-        favoriteLists = updated
-        saveFavoriteLists()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard let i = self.favoriteLists.firstIndex(where: { $0.id == listId }) else { return }
+            var list = self.favoriteLists[i]
+            list.movieIds.removeAll { $0 == movieId }
+            self.favoriteLists[i] = list
+            self.saveFavoriteLists()
+        }
     }
 
     func movies(in listId: UUID) -> [Movie] {
-        let lists = favoriteLists
-        guard let list = lists.first(where: { $0.id == listId }) else { return [] }
-        let cache = movieCache
-        let loaded = allLoadedMovies
+        guard let list = favoriteLists.first(where: { $0.id == listId }) else { return [] }
         return list.movieIds.compactMap { id in
-            cache.first { $0.id == id } ?? loaded.first { $0.id == id }
+            movieCache.first { $0.id == id } ?? allLoadedMovies.first { $0.id == id }
         }
     }
     
