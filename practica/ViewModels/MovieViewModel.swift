@@ -167,11 +167,11 @@ class MovieViewModel: ObservableObject {
         }
     }
 
-    /// Carga películas mejor valoradas para la pestaña Explorar (diferente a Inicio).
+    /// Carga películas para la pestaña Explorar (usa populares; distinto del discover de Inicio).
     func loadExploreMovies() {
         isLoadingExplore = true
         exploreErrorMessage = nil
-        tmdbService.fetchTopRatedMovies { [weak self] (result: Result<[Movie], Error>) in
+        tmdbService.fetchPopularMovies { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoadingExplore = false
                 switch result {
