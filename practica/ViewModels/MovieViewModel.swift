@@ -118,9 +118,14 @@ class MovieViewModel: ObservableObject {
         if list.movieIds.contains(movieId) { return }
         list.movieIds.append(movieId)
         copy[index] = list
-        favoriteLists = copy
-        saveFavoriteLists()
-        if let m = movie { addToCacheIfNeeded(m) }
+        let newValue = copy
+        let movieToCache = movie
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.favoriteLists = newValue
+            self.saveFavoriteLists()
+            if let m = movieToCache { self.addToCacheIfNeeded(m) }
+        }
     }
 
     func removeMovieFromList(movieId: Int, listId: UUID) {
@@ -130,8 +135,12 @@ class MovieViewModel: ObservableObject {
         var list = copy[index]
         list.movieIds.removeAll { $0 == movieId }
         copy[index] = list
-        favoriteLists = copy
-        saveFavoriteLists()
+        let newValue = copy
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.favoriteLists = newValue
+            self.saveFavoriteLists()
+        }
     }
 
     func movies(in listId: UUID) -> [Movie] {
