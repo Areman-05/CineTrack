@@ -16,43 +16,69 @@ struct DetailView: View {
             AppTheme.background.ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Tipo: Película o Serie
-                    Text(movie.mediaType?.displayName ?? "Película")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color.black)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(AppTheme.accent)
-                        .cornerRadius(6)
+                VStack(alignment: .leading, spacing: 18) {
+                    // Póster y badge
+                    ZStack(alignment: .topLeading) {
+                        AsyncImageView(url: movie.posterURL)
+                            .aspectRatio(2/3, contentMode: .fill)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 280)
+                            .clipped()
 
-                    Text(movie.title)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(AppTheme.textPrimary)
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(AppTheme.accent)
-                            .font(.subheadline)
-                        Text(String(format: "%.1f", movie.voteAverage))
-                            .foregroundColor(AppTheme.textSecondary)
-                        Text("·")
-                            .foregroundColor(AppTheme.textTertiary)
-                        Text(movie.releaseYear)
-                            .foregroundColor(AppTheme.textSecondary)
+                        Text(movie.mediaType?.displayName ?? "Película")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color(red: 0.15, green: 0.12, blue: 0.02))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AppTheme.accent)
+                            .cornerRadius(6)
+                            .padding(12)
                     }
-                    .font(.subheadline)
+                    .background(AppTheme.surface)
+                    .cornerRadius(AppTheme.cardCornerRadius)
+                    .padding(.horizontal, 16)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(movie.title)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(AppTheme.textPrimary)
+
+                        HStack(spacing: 8) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(AppTheme.accent)
+                                .font(.subheadline)
+                            Text(String(format: "%.1f", movie.voteAverage))
+                                .foregroundColor(AppTheme.textSecondary)
+                            Text("·")
+                                .foregroundColor(AppTheme.textTertiary)
+                            Text(movie.releaseYear)
+                                .foregroundColor(AppTheme.textSecondary)
+                        }
+                        .font(.subheadline)
+                    }
+                    .padding(.horizontal, 16)
 
                     if !movie.overview.isEmpty {
-                        Text(movie.overview)
-                            .font(.body)
-                            .foregroundColor(AppTheme.textSecondary)
-                            .lineSpacing(4)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Sinopsis")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppTheme.textTertiary)
+                            Text(movie.overview)
+                                .font(.body)
+                                .foregroundColor(AppTheme.textSecondary)
+                                .lineSpacing(4)
+                        }
+                        .padding(AppTheme.cardPadding)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppTheme.surface)
+                        .cornerRadius(AppTheme.cardCornerRadius)
+                        .padding(.horizontal, 16)
                     }
 
-                    // Sección: Favorito y estado
+                    // Acciones y estado
                     VStack(alignment: .leading, spacing: 14) {
                         Button(action: {
                             viewModel.toggleFavorite(movieId: movie.id)
@@ -66,8 +92,8 @@ struct DetailView: View {
                             .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.accent)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
-                            .background(AppTheme.surface)
-                            .cornerRadius(10)
+                            .background(AppTheme.surfaceElevated)
+                            .cornerRadius(AppTheme.posterCornerRadius)
                         }
                         .buttonStyle(PlainButtonStyle())
 
@@ -81,6 +107,7 @@ struct DetailView: View {
                                 }
                             }
                             .pickerStyle(SegmentedPickerStyle())
+                            .accentColor(AppTheme.accent)
                             .onChange(of: estadoVer, perform: { newValue in
                                 viewModel.setWatchStatus(movieId: movie.id, status: newValue)
                             })
@@ -93,8 +120,8 @@ struct DetailView: View {
                             TextField("Escribe una nota...", text: $notaPersonal)
                                 .foregroundColor(AppTheme.textPrimary)
                                 .padding(12)
-                                .background(AppTheme.surface)
-                                .cornerRadius(10)
+                                .background(AppTheme.surfaceElevated)
+                                .cornerRadius(AppTheme.posterCornerRadius)
                                 .onChange(of: notaPersonal, perform: { newValue in
                                     viewModel.updatePersonalNote(movieId: movie.id, note: newValue)
                                 })
@@ -115,8 +142,13 @@ struct DetailView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
+                    .padding(AppTheme.cardPadding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(AppTheme.surface)
+                    .cornerRadius(AppTheme.cardCornerRadius)
+                    .padding(.horizontal, 16)
                 }
-                .padding(20)
+                .padding(.vertical, 16)
             }
         }
         .navigationTitle(movie.title)

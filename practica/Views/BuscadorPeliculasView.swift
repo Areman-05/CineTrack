@@ -13,9 +13,9 @@ struct BuscadorPeliculasView: View {
             ZStack {
                 AppTheme.background.ignoresSafeArea()
 
-                VStack(spacing: 20) {
+                VStack(spacing: 16) {
                     // Barra de búsqueda
-                    HStack(spacing: 12) {
+                    HStack(spacing: 10) {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(AppTheme.textSecondary)
                             .font(.body)
@@ -24,34 +24,36 @@ struct BuscadorPeliculasView: View {
                         if !searchText.isEmpty {
                             Button(action: { searchText = "" }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(AppTheme.textSecondary)
+                                    .foregroundColor(AppTheme.textTertiary)
                             }
                         }
                     }
-                    .padding(14)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
                     .background(AppTheme.surface)
-                    .cornerRadius(12)
+                    .cornerRadius(AppTheme.cardCornerRadius)
                     .padding(.horizontal, 16)
 
                     // Filtros en tarjeta
-                    VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 12) {
                         Text("Filtros")
-                            .font(.subheadline)
+                            .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textTertiary)
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text("Puntuación mínima: \(String(format: "%.1f", minRating))")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(AppTheme.textSecondary)
                             Slider(value: $minRating, in: 0...10, step: 0.5)
                                 .accentColor(AppTheme.accent)
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        HStack {
                             Text("Género")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(AppTheme.textSecondary)
+                            Spacer()
                             Picker("Género", selection: $selectedGenreId) {
                                 Text("Todos").tag(nil as Int?)
                                 ForEach(viewModel.genres) { g in
@@ -60,27 +62,31 @@ struct BuscadorPeliculasView: View {
                             }
                             .pickerStyle(MenuPickerStyle())
                             .foregroundColor(AppTheme.textPrimary)
+                            .accentColor(AppTheme.accent)
                         }
                     }
-                    .padding(16)
+                    .padding(AppTheme.cardPadding)
                     .background(AppTheme.surface)
-                    .cornerRadius(12)
+                    .cornerRadius(AppTheme.cardCornerRadius)
                     .padding(.horizontal, 16)
 
                     // Botón Buscar
                     Button(action: aplicarFiltros) {
-                        HStack {
+                        HStack(spacing: 8) {
                             Image(systemName: "magnifyingglass")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
                             Text("Buscar")
                                 .fontWeight(.semibold)
                         }
-                        .foregroundColor(Color.black)
+                        .foregroundColor(Color(red: 0.12, green: 0.10, blue: 0.04))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(AppTheme.accent)
-                        .cornerRadius(12)
+                        .cornerRadius(AppTheme.cardCornerRadius)
                     }
                     .padding(.horizontal, 16)
+                    .buttonStyle(PlainButtonStyle())
 
                     // Lista de resultados
                     if viewModel.isLoading {
@@ -123,10 +129,10 @@ struct BuscadorPeliculasView: View {
                         List {
                             ForEach(viewModel.movies) { movie in
                                 NavigationLink(destination: DetailView(movie: movie)) {
-                                    FilaPeliculaView(movie: movie, viewModel: viewModel)
+                                    MovieCardView(movie: movie, viewModel: viewModel, showFavorite: true, showWatchStatus: false)
                                 }
-                                .listRowBackground(AppTheme.surface)
-                                .foregroundColor(AppTheme.textPrimary)
+                                .listRowBackground(AppTheme.background)
+                                .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
                             }
                         }
                         .listStyle(PlainListStyle())
@@ -148,47 +154,6 @@ struct BuscadorPeliculasView: View {
         let rating = minRating > 0 ? minRating : nil
         let ids = selectedGenreId.map { [$0] }
         viewModel.searchWithFilters(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines), minRating: rating, genreIds: ids)
-    }
-}
-
-/// Fila de película/serie en el listado: título, tipo, favorito, puntuación.
-private struct FilaPeliculaView: View {
-    let movie: Movie
-    @ObservedObject var viewModel: MovieViewModel
-
-    var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(movie.title)
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .foregroundColor(AppTheme.textPrimary)
-                    .lineLimit(2)
-                Text(movie.mediaType?.displayName ?? "Pelicula")
-                    .font(.caption)
-                    .foregroundColor(AppTheme.accent)
-            }
-            Spacer()
-            Button(action: {
-                viewModel.toggleFavorite(movieId: movie.id)
-            }) {
-                Image(systemName: viewModel.isFavorite(movieId: movie.id) ? "heart.fill" : "heart")
-                    .font(.system(size: 18))
-                    .foregroundColor(viewModel.isFavorite(movieId: movie.id) ? AppTheme.favorite : AppTheme.textTertiary)
-            }
-            .buttonStyle(PlainButtonStyle())
-            HStack(spacing: 4) {
-                Image(systemName: "star.fill")
-                    .font(.caption2)
-                    .foregroundColor(AppTheme.accent)
-                Text(String(format: "%.1f", movie.voteAverage))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(AppTheme.textSecondary)
-                    .frame(width: 32, alignment: .trailing)
-            }
-        }
-        .padding(.vertical, 6)
     }
 }
 
