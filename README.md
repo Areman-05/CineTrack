@@ -7,15 +7,6 @@ App iOS para buscar películas, explorar tendencias, gestionar favoritos y lista
 
 ---
 
-## Instrucciones
-
-1. Clonar el repositorio o descargar el proyecto.
-2. Abrir `practica.xcodeproj` en Xcode.
-3. Seleccionar un simulador o dispositivo (iPhone) y ejecutar (⌘R).
-4. La API de TMDB se usa con una API key incluida en el proyecto; no es necesario configurar nada para probar.
-
----
-
 ## Arquitectura MVVM
 
 - **Models:** `Movie`, `MovieResponse`, `Genre`, `GenreListResponse`, `FavoriteList`, `UserPreference`, `UserProfile`. Coherentes con la API de TMDB y con la lógica de favoritos/listas.
@@ -40,7 +31,7 @@ App iOS para buscar películas, explorar tendencias, gestionar favoritos y lista
 - **URLSession** en `TMDBService`: `fetchPopularMovies`, `searchMovies`, `discoverMovies`, `fetchMovieGenres`.
 - Datos mostrados en **List** y **ScrollView** (búsqueda, explorar, favoritos, listas).
 - **Errores:** `TMDBError` con `LocalizedError`; mensajes mostrados en UI (por ejemplo en Buscador y Explorar con `errorMessage` / `exploreErrorMessage` y botón Reintentar).
-- **Estados de carga:** `ProgressView` mientras se buscan o cargan películas; estados vacíos con mensajes claros (“No tienes favoritos”, “Usa los filtros y pulsa Buscar”, etc.).
+- **Estados de carga:** `ProgressView` mientras se buscan o cargan películas; estados vacíos con mensajes claros ("No tienes favoritos", "Usa los filtros y pulsa Buscar", etc.).
 
 ---
 
@@ -49,49 +40,21 @@ App iOS para buscar películas, explorar tendencias, gestionar favoritos y lista
 - **Consultar:** Búsqueda con filtros (puntuación, género), explorar populares, listar favoritos y películas por lista.
 - **Añadir:** Añadir película a favoritos (corazón), crear lista (Nueva lista), añadir película a una lista (Añadir a lista); validación de nombre no vacío al crear lista.
 - **Editar:** Estado de visualización (Por ver / Viendo / Visto) y nota personal en el detalle de cada película; persistido en UserDefaults.
-- **Eliminar:** Quitar de favoritos (swipe o botón), eliminar película de una lista (swipe en ListaDetailView), eliminar lista (swipe o menú contextual “Eliminar lista”).
+- **Eliminar:** Quitar de favoritos (swipe o botón), eliminar película de una lista (swipe en ListaDetailView), eliminar lista (swipe o menú contextual "Eliminar lista").
 - **Duplicidad:** No se añade la misma película dos veces a una lista (`list.movieIds.contains`); `savedMovies` y listas se mantienen coherentes.
-
----
-
-## Extra implementado
-
-Se cubren varios aspectos valorables como extra:
-
-1. **Persistencia:** UserDefaults para preferencias por película (`UserPreference`: favorito, nota, estado), películas guardadas (`savedMovies`), listas de favoritos (`favoriteLists`) y perfil (nombre, contraseña, sesión). Se guarda y recupera al abrir la app.
-2. **Búsqueda y filtrado:** Buscador con texto, puntuación mínima y género; integración con `discoverMovies` y `searchMovies` de TMDB; resultados en lista sin duplicados innecesarios.
-3. **Pantalla de preferencias / perfil:** Perfil con estadísticas (favoritos, listas), inicio/cierre de sesión y nombre de usuario persistido; opciones aplicadas en la app.
-
----
-
-## Gestión de assets
-
-- **AppIcon:** AppIcon.appiconset configurado con las resoluciones necesarias para iPhone, iPad y marketing. Hay que añadir las imágenes correspondientes a cada tamaño en el catálogo de assets.
-- **Display Name:** Definido en `Info.plist` como `CFBundleDisplayName: CineTrack` para que el nombre visible en el dispositivo sea “CineTrack”.
-- **Paleta:** Colores y tipografía centralizados en `AppTheme` (Swift); se usa `AccentColor.colorset` en el proyecto. La paleta de la aplicación está definida y aplicada de forma consistente en las vistas.
-
----
-
-## Buenas prácticas
-
-- Nombres en lowerCamelCase (variables/funciones) y UpperCamelCase (tipos); tipado explícito y optionals manejados correctamente.
-- Constantes para claves de UserDefaults y URLs en el servicio; modificadores de acceso (`private` donde corresponde).
-- Comentarios en partes clave (MARK, cabeceras de modelos y servicios); indentación y formato coherentes.
-- Estructura en grupos: Views, ViewModels, Services y modelos identificables.
 
 ---
 
 ## Videotour
 
-Videotour demostrativo (máximo 5 minutos) publicado en YouTube (modo oculto):
+Videotour demostrativo publicado en YouTube:
 
-**[ENLACE AL VIDEOTOUR AQUÍ]**
+https://www.youtube.com/watch?v=e7q-YO0JXnk
 
-En el videotour se muestra: navegación (tabs, detalle, modales), colección y detalle, CRUD completo (añadir/quitar favoritos, listas, editar nota/estado), extra (persistencia, búsqueda/filtros, perfil) y, si aplica, cambio a portrait/landscape y tema.
+En el videotour se muestra: navegación (tabs, detalle, modales), colección y detalle, CRUD completo (añadir/quitar favoritos, listas, editar nota/estado), persistencia, búsqueda/filtros, perfil y cambio a portrait/landscape y tema.
 
 ---
 
-## Repositorio
+## Autores
 
-- Proyecto entregado vía GitHub Classroom y Sallenet.
-- Commits con mensajes descriptivos de los cambios realizados.
+Hecho por Pablo Arenas Mancebo y Mateo Acha Sanchez
